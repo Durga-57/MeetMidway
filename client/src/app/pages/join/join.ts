@@ -10,116 +10,118 @@ import { GeocoderService, GeoResult } from "../../services/geocoder.service";
   standalone: true,
   imports: [RouterLink, FormsModule],
   template: `
-    <div class="page-shell--centered">
-      <div class="card" style="width: min(480px, 100%);">
-        <div style="margin-bottom: 1rem;">
-          <a routerLink="/" class="btn btn-link" style="font-size: 12px;">← Back to home</a>
-        </div>
+    <div class="page-shell">
+      <section class="home-hero create-hero">
+        <a routerLink="/" class="btn btn-link create-back">← Back to home</a>
 
-        <h1 style="font-size: 1.3rem; margin-bottom: 0.25rem;">Join a trip</h1>
+        <h1 class="home-hero__title">Join a <span class="accent">trip session</span></h1>
         @if (tripName) {
-          <p style="margin-bottom: 1.25rem;">Joining: <strong>{{ tripName }}</strong></p>
+          <p class="home-hero__subtitle">Joining: <strong>{{ tripName }}</strong></p>
         } @else {
-          <p style="margin-bottom: 1.25rem;">Enter the trip code and your starting address.</p>
+          <p class="home-hero__subtitle">Enter the invite code, your name, and your starting address.</p>
         }
 
-        <form (ngSubmit)="handleSubmit()">
-          <div class="form-group">
-            <label for="trip-code" class="form-label">Trip code</label>
-            <input
-              id="trip-code"
-              type="text"
-              name="code"
-              class="form-input"
-              style="text-align: center; font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: 0.15em;"
-              placeholder="AB12CD"
-              [(ngModel)]="code"
-              (ngModelChange)="onCodeChange($event)"
-              maxLength="6"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="friend-name" class="form-label">Your name</label>
-            <input
-              id="friend-name"
-              type="text"
-              name="name"
-              class="form-input"
-              placeholder="Alex"
-              [(ngModel)]="name"
-              maxLength="40"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="friend-address" class="form-label">Starting address</label>
-            <div class="autocomplete-wrapper" #suggestionsWrapper>
-              <div style="position: relative;">
+        <div class="card create-card">
+          <form (ngSubmit)="handleSubmit()" class="create-form">
+            <div class="create-grid">
+              <div class="form-group">
+                <label for="trip-code" class="form-label">Trip code</label>
                 <input
-                  id="friend-address"
+                  id="trip-code"
                   type="text"
-                  name="address"
+                  name="code"
                   class="form-input"
-                  [class.error]="addressError"
-                  placeholder="123 Main St, New York, NY"
-                  [(ngModel)]="address"
-                  (ngModelChange)="handleAddressInput($event)"
-                  (focus)="onAddressFocus()"
-                  autocomplete="off"
+                  style="text-align: center; font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: 0.15em;"
+                  placeholder="AB12CD"
+                  [(ngModel)]="code"
+                  (ngModelChange)="onCodeChange($event)"
+                  maxLength="6"
                   required
                 />
-                @if (geoLoading) {
-                  <div style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);">
-                    <div class="spinner spinner--sm"></div>
-                  </div>
-                }
               </div>
 
-              @if (showSuggestions && suggestions.length > 0) {
-                <div class="autocomplete-list">
-                  @for (s of suggestions; track s.display_name) {
-                    <button
-                      type="button"
-                      class="autocomplete-item"
-                      (click)="selectSuggestion(s.display_name)"
-                    >
-                      📍 {{ s.display_name }}
-                    </button>
+              <div class="form-group">
+                <label for="friend-name" class="form-label">Your name</label>
+                <input
+                  id="friend-name"
+                  type="text"
+                  name="name"
+                  class="form-input"
+                  placeholder="Alex"
+                  [(ngModel)]="name"
+                  maxLength="40"
+                  required
+                />
+              </div>
+
+              <div class="form-group create-field--full">
+                <label for="friend-address" class="form-label">Starting address</label>
+                <div class="autocomplete-wrapper" #suggestionsWrapper>
+                  <div style="position: relative;">
+                    <input
+                      id="friend-address"
+                      type="text"
+                      name="address"
+                      class="form-input"
+                      [class.error]="addressError"
+                      placeholder="123 Main St, New York, NY"
+                      [(ngModel)]="address"
+                      (ngModelChange)="handleAddressInput($event)"
+                      (focus)="onAddressFocus()"
+                      autocomplete="off"
+                      required
+                    />
+                    @if (geoLoading) {
+                      <div style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);">
+                        <div class="spinner spinner--sm"></div>
+                      </div>
+                    }
+                  </div>
+
+                  @if (showSuggestions && suggestions.length > 0) {
+                    <div class="autocomplete-list">
+                      @for (s of suggestions; track s.display_name) {
+                        <button
+                          type="button"
+                          class="autocomplete-item"
+                          (click)="selectSuggestion(s.display_name)"
+                        >
+                          📍 {{ s.display_name }}
+                        </button>
+                      }
+                    </div>
                   }
                 </div>
-              }
+                @if (addressError) {
+                  <p class="form-error">{{ addressError }}</p>
+                }
+              </div>
             </div>
-            @if (addressError) {
-              <p class="form-error">{{ addressError }}</p>
+
+            @if (tripError && !addressError) {
+              <div class="alert alert-error">{{ tripError }}</div>
             }
-          </div>
 
-          @if (tripError && !addressError) {
-            <div class="alert alert-error">{{ tripError }}</div>
-          }
+            <button
+              type="submit"
+              class="btn btn-primary btn-full"
+              [disabled]="loading || !code.trim() || !name.trim() || !address.trim()"
+            >
+              @if (loading) {
+                <div class="spinner spinner--sm spinner--white"></div>
+                <span>Joining…</span>
+              } @else {
+                <span>Join trip</span>
+              }
+            </button>
+          </form>
+        </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary btn-full"
-            [disabled]="loading || !code.trim() || !name.trim() || !address.trim()"
-          >
-            @if (loading) {
-              <div class="spinner spinner--sm spinner--white"></div>
-              <span>Joining…</span>
-            } @else {
-              <span>Join trip</span>
-            }
-          </button>
-        </form>
-
-        <p style="text-align: center; margin-top: 0.75rem; margin-bottom: 0; font-size: 12px; color: var(--text-faint);">
+        <p class="create-note">
           Don't have a code?
           <a routerLink="/create">Create a trip</a>
         </p>
-      </div>
+      </section>
     </div>
   `,
 })

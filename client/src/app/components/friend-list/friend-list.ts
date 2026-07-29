@@ -9,7 +9,7 @@ import { Friend } from "@shared/types";
       <div class="section-label">Participants ({{ friends.length }})</div>
 
       @if (friends.length === 0) {
-        <div class="friend-empty">No participants yet. Add the first address below.</div>
+        <div class="friend-empty">No participants yet. The creator is added when the trip starts.</div>
       }
 
       @for (friend of friends; track friend.id) {

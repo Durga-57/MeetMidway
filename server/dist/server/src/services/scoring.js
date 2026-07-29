@@ -59,13 +59,18 @@ function fairnessScore(distances) {
     return clamp(100 - (stdDev / avg) * 50, 0, 100);
 }
 /** Score and rank places by fairness */
-function scorePlaces(places, friends, placeType) {
+function scorePlaces(places, friends, placeType, midpoint) {
     const scored = places.map((place) => {
         const distances = friends.map((f) => haversine(f.lat, f.lng, place.lat, place.lng));
         const avg = distances.reduce((a, b) => a + b, 0) / distances.length;
         const maxD = Math.max(...distances);
         const minD = Math.min(...distances);
-        const score = fairnessScore(distances);
+        const spread = maxD - minD;
+        const midpointDistance = midpoint
+            ? haversine(midpoint.lat, midpoint.lng, place.lat, place.lng)
+            : avg;
+        // Favor spots that are both balanced across the group and close to the midpoint.
+        const score = clamp(100 - maxD * 10 - spread * 12 - midpointDistance * 8, 0, 100);
         return {
             id: place.id,
             name: place.name,
@@ -85,6 +90,10 @@ function scorePlaces(places, friends, placeType) {
         const diff = b.fairnessScore - a.fairnessScore;
         if (Math.abs(diff) > 0.001)
             return diff;
+        if (a.maxD !== b.maxD)
+            return a.maxD - b.maxD;
+        if (a.minD !== b.minD)
+            return a.minD - b.minD;
         return a.avg - b.avg;
     })
         .slice(0, 8);

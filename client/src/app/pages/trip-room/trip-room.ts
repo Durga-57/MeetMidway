@@ -69,7 +69,7 @@ import { NgZone } from "@angular/core";
                 class="btn btn-secondary btn-sm btn-full"
                 style="margin-top: 0.5rem;"
               >
-                {{ showAddForm ? "✕ Cancel" : "+ Add starting address" }}
+                {{ showAddForm ? "✕ Cancel" : "+ Add participant" }}
               </button>
 
               <!-- Add friend form -->
@@ -82,7 +82,7 @@ import { NgZone } from "@angular/core";
                     type="text"
                     name="addName"
                     class="form-input"
-                    placeholder="Name"
+                    placeholder="Participant name"
                     [(ngModel)]="addName"
                     maxLength="40"
                     required
@@ -136,7 +136,7 @@ import { NgZone } from "@angular/core";
                       <div class="spinner spinner--sm spinner--white"></div>
                       <span>Adding…</span>
                     } @else {
-                      <span>Add Me</span>
+                      <span>Add participant</span>
                     }
                   </button>
                 </form>

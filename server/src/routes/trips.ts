@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { Server } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
-import { Trip, PlaceType, Friend, FRIEND_COLORS } from "../../../shared/types";
+import { Trip, PlaceType, Friend, FRIEND_COLORS, PLACE_TYPE_LABELS } from "../../../shared/types";
 import { getTrip, saveTrip } from "../services/redis";
 import { computeMidpoint, scorePlaces } from "../services/scoring";
 import { fetchNearbyPlaces } from "../services/overpass";
@@ -11,6 +11,14 @@ const USER_AGENT = "MeetMidway/1.0";
 
 function generateCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function normalizeText(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isValidPlaceType(value: unknown): value is PlaceType {
+  return typeof value === "string" && value in PLACE_TYPE_LABELS;
 }
 
 async function geocodeAddress(
@@ -47,6 +55,21 @@ async function geocodeAddress(
   }
 }
 
+async function buildFriend(name: string, address: string, colorIndex: number): Promise<Friend | null> {
+  const coords = await geocodeAddress(address);
+  if (!coords) return null;
+
+  return {
+    id: uuidv4(),
+    name,
+    address,
+    lat: coords.lat,
+    lng: coords.lng,
+    color: FRIEND_COLORS[colorIndex % FRIEND_COLORS.length],
+    joinedAt: Date.now(),
+  };
+}
+
 export function tripsRouter(io: Server): Router {
   const router = Router();
 
@@ -55,10 +78,31 @@ export function tripsRouter(io: Server): Router {
     const { name, placeType } = req.body as {
       name?: string;
       placeType?: PlaceType;
+      creatorName?: string;
+      creatorAddress?: string;
     };
+    const tripName = normalizeText(name);
+    const creatorName = normalizeText(req.body?.creatorName);
+    const creatorAddress = normalizeText(req.body?.creatorAddress);
 
-    if (!name || !placeType) {
-      return res.status(400).json({ error: "name and placeType are required" });
+    if (!tripName || !placeType || !creatorName || !creatorAddress) {
+      return res.status(400).json({ error: "name, placeType, creatorName, and creatorAddress are required" });
+    }
+
+    if (tripName.length < 2 || tripName.length > 60) {
+      return res.status(400).json({ error: "Trip name must be between 2 and 60 characters" });
+    }
+
+    if (!isValidPlaceType(placeType)) {
+      return res.status(400).json({ error: "Invalid place category" });
+    }
+
+    if (creatorName.length < 2 || creatorName.length > 40) {
+      return res.status(400).json({ error: "Creator name must be between 2 and 40 characters" });
+    }
+
+    if (creatorAddress.length < 3 || creatorAddress.length > 120) {
+      return res.status(400).json({ error: "Creator address must be between 3 and 120 characters" });
     }
 
     let code = generateCode();
@@ -68,11 +112,17 @@ export function tripsRouter(io: Server): Router {
     }
 
     const now = Date.now();
+    const creator = await buildFriend(creatorName, creatorAddress, 0);
+
+    if (!creator) {
+      return res.status(422).json({ error: "Creator address not found" });
+    }
+
     const trip: Trip = {
       code,
-      name: name.trim(),
+      name: tripName,
       placeType,
-      friends: [],
+      friends: [creator],
       createdAt: now,
       expiresAt: now + 86400 * 1000,
     };
@@ -92,34 +142,43 @@ export function tripsRouter(io: Server): Router {
   router.post("/:code/friends", async (req: Request, res: Response) => {
     const code = req.params.code.toUpperCase();
     const { name, address } = req.body as { name?: string; address?: string };
+    const friendName = normalizeText(name);
+    const friendAddress = normalizeText(address);
 
-    if (!name || !address) {
+    if (!friendName || !friendAddress) {
       return res.status(400).json({ error: "name and address are required" });
+    }
+
+    if (friendName.length < 2 || friendName.length > 40) {
+      return res.status(400).json({ error: "Name must be between 2 and 40 characters" });
+    }
+
+    if (friendAddress.length < 3 || friendAddress.length > 120) {
+      return res.status(400).json({ error: "Address must be between 3 and 120 characters" });
     }
 
     const trip = await getTrip(code);
     if (!trip) return res.status(404).json({ error: "Trip not found" });
 
-    // Geocode on server
-    const coords = await geocodeAddress(address);
+    const coords = await geocodeAddress(friendAddress);
     if (!coords) {
       return res.status(422).json({ error: "Address not found" });
     }
 
     // Deduplicate name
-    let friendName = name.trim();
+    let dedupedFriendName = friendName;
     const existingNames = trip.friends.map((f) => f.name);
-    if (existingNames.includes(friendName)) {
+    if (existingNames.includes(dedupedFriendName)) {
       let counter = 2;
-      while (existingNames.includes(`${friendName} ${counter}`)) counter++;
-      friendName = `${friendName} ${counter}`;
+      while (existingNames.includes(`${dedupedFriendName} ${counter}`)) counter++;
+      dedupedFriendName = `${dedupedFriendName} ${counter}`;
     }
 
     const color = FRIEND_COLORS[trip.friends.length % FRIEND_COLORS.length];
     const friend: Friend = {
       id: uuidv4(),
-      name: friendName,
-      address: address.trim(),
+      name: dedupedFriendName,
+      address: friendAddress,
       lat: coords.lat,
       lng: coords.lng,
       color,
@@ -181,12 +240,41 @@ export function tripsRouter(io: Server): Router {
     const midpoint = computeMidpoint(trip.friends);
 
     try {
-      const rawPlaces = await fetchNearbyPlaces(
-        midpoint.lat,
-        midpoint.lng,
-        radius,
-        type
-      );
+      const attemptRadii = [radius, Math.min(Math.max(radius * 1.5, radius + 2), 20)];
+      let rawPlaces = [] as Awaited<ReturnType<typeof fetchNearbyPlaces>>;
+
+      for (const attemptRadius of attemptRadii) {
+        try {
+          rawPlaces = await fetchNearbyPlaces(
+            midpoint.lat,
+            midpoint.lng,
+            attemptRadius,
+            type
+          );
+          if (rawPlaces.length > 0) break;
+        } catch (attemptErr: any) {
+          console.warn(
+            `Overpass attempt failed at radius ${attemptRadius}km:`,
+            attemptErr?.message || attemptErr
+          );
+        }
+      }
+
+      if (rawPlaces.length === 0) {
+        const fallbackRadius = Math.min(Math.max(radius * 2, radius + 5), 20);
+        if (fallbackRadius > radius) {
+          try {
+            rawPlaces = await fetchNearbyPlaces(
+              midpoint.lat,
+              midpoint.lng,
+              fallbackRadius,
+              type
+            );
+          } catch (fallbackErr: any) {
+            console.error("Overpass fallback failed:", fallbackErr.message);
+          }
+        }
+      }
 
       if (rawPlaces.length === 0) {
         io.to(code).emit("places:results", {
@@ -196,7 +284,7 @@ export function tripsRouter(io: Server): Router {
         return res.json({ places: [], midpoint });
       }
 
-      const places = scorePlaces(rawPlaces, trip.friends, type);
+      const places = scorePlaces(rawPlaces, trip.friends, type, midpoint);
 
       io.to(code).emit("places:results", { places, midpoint });
       return res.json({ places, midpoint });

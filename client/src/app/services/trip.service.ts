@@ -12,8 +12,18 @@ export class TripService {
 
   constructor(private http: HttpClient) {}
 
-  createTrip(name: string, placeType: PlaceType): Observable<{ code: string; trip: Trip }> {
-    return this.http.post<{ code: string; trip: Trip }>(`${this.api}/api/trips`, { name, placeType });
+  createTrip(
+    name: string,
+    placeType: PlaceType,
+    creatorName: string,
+    creatorAddress: string
+  ): Observable<{ code: string; trip: Trip }> {
+    return this.http.post<{ code: string; trip: Trip }>(`${this.api}/api/trips`, {
+      name,
+      placeType,
+      creatorName,
+      creatorAddress,
+    });
   }
 
   fetchTrip(code: string): Observable<{ trip: Trip }> {

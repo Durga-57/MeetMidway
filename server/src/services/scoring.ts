@@ -83,7 +83,8 @@ export interface RawPlace {
 export function scorePlaces(
   places: RawPlace[],
   friends: Friend[],
-  placeType: PlaceType
+  placeType: PlaceType,
+  midpoint?: { lat: number; lng: number }
 ): ScoredPlace[] {
   const scored: ScoredPlace[] = places.map((place) => {
     const distances = friends.map((f) =>
@@ -92,7 +93,17 @@ export function scorePlaces(
     const avg = distances.reduce((a, b) => a + b, 0) / distances.length;
     const maxD = Math.max(...distances);
     const minD = Math.min(...distances);
-    const score = fairnessScore(distances);
+    const spread = maxD - minD;
+    const midpointDistance = midpoint
+      ? haversine(midpoint.lat, midpoint.lng, place.lat, place.lng)
+      : avg;
+
+    // Favor spots that are both balanced across the group and close to the midpoint.
+    const score = clamp(
+      100 - maxD * 10 - spread * 12 - midpointDistance * 8,
+      0,
+      100
+    );
 
     return {
       id: place.id,
@@ -113,6 +124,8 @@ export function scorePlaces(
     .sort((a, b) => {
       const diff = b.fairnessScore - a.fairnessScore;
       if (Math.abs(diff) > 0.001) return diff;
+      if (a.maxD !== b.maxD) return a.maxD - b.maxD;
+      if (a.minD !== b.minD) return a.minD - b.minD;
       return a.avg - b.avg;
     })
     .slice(0, 8);

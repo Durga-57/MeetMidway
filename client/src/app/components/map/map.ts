@@ -153,12 +153,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy
       const icon = L.divIcon({
         html: `<div class="friend-marker" style="background:${friend.color}">${friend.name[0].toUpperCase()}</div>`,
         className: "",
-        iconSize: [36, 36],
-        iconAnchor: [18, 18],
+        iconSize: [42, 42],
+        iconAnchor: [21, 21],
       });
 
       const marker = L.marker([friend.lat, friend.lng], { icon })
         .addTo(this.map!)
+        .setZIndexOffset(1000)
         .bindPopup(
           `<div style="font-weight:600;font-size:13px;color:#1a1a1a">${friend.name}</div><div style="font-size:11px;color:#888;margin-top:2px">${friend.address}</div>`
         );
@@ -179,12 +180,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy
       const icon = L.divIcon({
         html: `<div class="midpoint-marker"></div>`,
         className: "",
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
       });
 
       this.midpointMarker = L.marker([this.midpoint.lat, this.midpoint.lng], { icon })
         .addTo(this.map)
+        .setZIndexOffset(1200)
         .bindPopup('<div style="font-weight:600;font-size:13px;color:#1a1a1a">📍 Midpoint</div>');
     }
   }
@@ -202,12 +204,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy
       const icon = L.divIcon({
         html: `<div class="place-marker${isSelected ? " selected" : ""}">${emoji}</div>`,
         className: "",
-        iconSize: [36, 36],
-        iconAnchor: [18, 18],
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
       });
 
       const marker = L.marker([place.lat, place.lng], { icon })
         .addTo(this.map!)
+        .setZIndexOffset(isSelected ? 1100 : 900)
         .bindPopup(
           `<div style="font-weight:600;font-size:13px;color:#1a1a1a">${place.name}</div><div style="font-size:11px;color:#888;margin-top:4px">Fairness: ${place.fairnessScore.toFixed(0)}%</div>`
         );
@@ -233,19 +236,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy
       const place = this.places.find((p) => p.id === this.selectedPlaceId);
       if (place) {
         this.friends.forEach((friend) => {
-          const line = L.polyline(
-            [
-              [friend.lat, friend.lng],
-              [place.lat, place.lng],
-            ],
-            {
-              color: friend.color,
-              weight: 2,
-              opacity: 0.6,
-              dashArray: "6, 6",
-            }
-          ).addTo(this.map!);
-          this.polylines.push(line);
+          const path = [
+            [friend.lat, friend.lng],
+            [place.lat, place.lng],
+          ] as [number, number][];
+
+          const halo = L.polyline(path, {
+            color: "#ffffff",
+            weight: 8,
+            opacity: 0.85,
+            lineCap: "round",
+          }).addTo(this.map!);
+
+          const line = L.polyline(path, {
+            color: friend.color,
+            weight: 4,
+            opacity: 0.95,
+            dashArray: "8, 8",
+            lineCap: "round",
+          }).addTo(this.map!);
+
+          this.polylines.push(halo, line);
         });
       }
     }

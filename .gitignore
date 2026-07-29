@@ -1,0 +1,14 @@
+# Root ignore rules for local-only configuration and build output
+.env
+.env.*
+*.local
+
+# Build artifacts
+dist/
+tmp/
+out-tsc/
+coverage/
+
+# Logs
+npm-debug.log
+yarn-error.log

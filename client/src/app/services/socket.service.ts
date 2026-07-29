@@ -44,6 +44,18 @@ export class SocketService {
       });
     }
 
+    this.socket.off("trip:state");
+    this.socket.off("friend:joined");
+    this.socket.off("friend:left");
+    this.socket.off("places:results");
+    this.socket.off("trip:error");
+
+    this.socket.on("trip:error", ({ error }: { error: string }) => {
+      this.ngZone.run(() => {
+        console.error("SocketService: trip error", error);
+      });
+    });
+
     console.log("SocketService: emitting room:join");
     this.socket.emit("room:join", { code });
 
@@ -92,6 +104,7 @@ export class SocketService {
       this.socket.off("friend:joined");
       this.socket.off("friend:left");
       this.socket.off("places:results");
+      this.socket.off("trip:error");
     }
   }
 }
