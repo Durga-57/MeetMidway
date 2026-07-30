@@ -12,10 +12,24 @@ const isLocalhost =
   typeof window !== "undefined" &&
   ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
-const defaultApiUrl = isLocalhost ? "http://localhost:3000" : "";
+const defaultApiUrl =
+  typeof window !== "undefined"
+    ? isLocalhost
+      ? "http://localhost:3000"
+      : window.location.origin
+    : "http://localhost:3000";
+
+function normalizeUrl(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
+const resolvedApiUrl = runtimeConfig.apiUrl ? normalizeUrl(runtimeConfig.apiUrl) : defaultApiUrl;
+const resolvedSocketUrl = runtimeConfig.socketUrl
+  ? normalizeUrl(runtimeConfig.socketUrl)
+  : resolvedApiUrl;
 
 export const environment = {
   production: false,
-  apiUrl: runtimeConfig.apiUrl || defaultApiUrl,
-  socketUrl: runtimeConfig.socketUrl || defaultApiUrl,
+  apiUrl: resolvedApiUrl,
+  socketUrl: resolvedSocketUrl,
 };
