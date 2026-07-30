@@ -1,4 +1,4 @@
 window.__MEETMIDWAY_CONFIG__ = {
-  apiUrl: "https://your-render-server-url.onrender.com",
-  socketUrl: "https://your-render-server-url.onrender.com"
+  apiUrl: "https://meetmidway.onrender.com",
+  socketUrl: "https://meetmidway.onrender.com"
 };
