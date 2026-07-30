@@ -18,7 +18,7 @@ console.log("CORS CLIENT_URL loaded:", clientUrl);
 const io = new Server(httpServer, {
   cors: {
     origin: clientUrl,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
   },
 });
@@ -27,6 +27,7 @@ const io = new Server(httpServer, {
 app.use(
   cors({
     origin: clientUrl,
+    methods: ["GET", "POST", "DELETE"],
     credentials: true,
   })
 );
