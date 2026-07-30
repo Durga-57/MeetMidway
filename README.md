@@ -35,6 +35,7 @@ The client runs on `http://localhost:4200` and the API on `http://localhost:3000
 - Host both client and server behind HTTPS. Most platforms provide HTTPS automatically.
 - Set the backend `CLIENT_URL` to the deployed frontend origin.
 - Keep Socket.IO and API traffic on the same HTTPS origin or a trusted proxy path so the live room updates work in production.
+- For the Angular client, set `MEETMIDWAY_API_URL` and `MEETMIDWAY_SOCKET_URL` in the frontend build environment so the deployed app points at the backend service instead of its own origin.
 - There is no login flow in this repo, so there are no passwords to store. If you add auth later, hash passwords before storage.
 
 ## Security and validation

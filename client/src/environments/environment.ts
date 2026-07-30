@@ -1,12 +1,21 @@
+type RuntimeConfig = {
+  apiUrl?: string;
+  socketUrl?: string;
+};
+
+const runtimeConfig =
+  typeof globalThis !== "undefined"
+    ? ((globalThis as typeof globalThis & { __MEETMIDWAY_CONFIG__?: RuntimeConfig }).__MEETMIDWAY_CONFIG__ || {})
+    : {};
+
 const isLocalhost =
   typeof window !== "undefined" &&
   ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
-const runtimeOrigin =
-  typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+const defaultApiUrl = isLocalhost ? "http://localhost:3000" : "";
 
 export const environment = {
   production: false,
-  apiUrl: isLocalhost ? "http://localhost:3000" : runtimeOrigin,
-  socketUrl: isLocalhost ? "http://localhost:3000" : runtimeOrigin,
+  apiUrl: runtimeConfig.apiUrl || defaultApiUrl,
+  socketUrl: runtimeConfig.socketUrl || defaultApiUrl,
 };
