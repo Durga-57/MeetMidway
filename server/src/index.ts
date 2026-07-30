@@ -12,12 +12,25 @@ import { registerSocketHandlers } from "./socket/handlers";
 
 const app = express();
 const httpServer = createServer(app);
-const clientUrl = (process.env.CLIENT_URL || "http://localhost:4200").trim();
+const clientUrl = (process.env.CLIENT_URL || "http://localhost:4200").trim().replace(/\/$/, "");
 console.log("CORS CLIENT_URL loaded:", clientUrl);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: clientUrl,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Normalize the origin by removing trailing slash
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      const normalizedClientUrl = clientUrl.replace(/\/$/, "");
+      
+      if (normalizedOrigin === normalizedClientUrl) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -27,7 +40,20 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(
   cors({
-    origin: clientUrl,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      // Normalize the origin by removing trailing slash
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      const normalizedClientUrl = clientUrl.replace(/\/$/, "");
+      
+      if (normalizedOrigin === normalizedClientUrl) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
