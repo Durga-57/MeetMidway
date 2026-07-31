@@ -92,6 +92,13 @@ export class AuthService {
     if (error) throw error;
   }
 
+  async signOut(): Promise<void> {
+    const client = this.requireClient();
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
+    this.session.set(null);
+  }
+
   private requireClient(): SupabaseClient {
     if (!this.client) {
       throw new AuthError('Supabase is not configured yet. Add the project URL and publishable key to runtime configuration.');

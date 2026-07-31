@@ -174,7 +174,7 @@ import { AuthService } from '../../services/auth.service';
           </aside>
 
           <!-- Map panel -->
-          <section class="trip-shell__map">
+          <section class="trip-shell__map trip-shell__map--compact">
             @if (midpoint) {
               <div class="midpoint-badge">
                 📍 Midpoint: {{ midpoint.lat.toFixed(4) }}, {{ midpoint.lng.toFixed(4) }}

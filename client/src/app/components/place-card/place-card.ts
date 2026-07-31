@@ -30,7 +30,8 @@ import { formatDistance } from "../../utils/geo";
 
       <div class="place-card__actions" (click)="$event.stopPropagation()">
         <button class="place-vote-btn" type="button" [class.active]="hasVoted" (click)="vote.emit()" [disabled]="!!confirmedPlaceId">
-          {{ hasVoted ? 'Voted' : 'Vote for this' }} <span>{{ voteCount }}</span>
+          <span class="heart-icon">{{ hasVoted ? '❤️' : '🤍' }}</span>
+          <span>{{ voteCount }}</span>
         </button>
         @if (confirmedPlaceId === place.id) {
           <span class="place-confirmed">Confirmed spot</span>
@@ -38,6 +39,20 @@ import { formatDistance } from "../../utils/geo";
           <button class="place-confirm-btn" type="button" (click)="confirm.emit()">Lock this spot</button>
         }
       </div>
+
+      <!-- Voter avatars -->
+      @if (voters.length > 0) {
+        <div class="place-card__voters">
+          <span class="place-card__voters-label">Voted by:</span>
+          <div class="place-card__voters-list">
+            @for (voter of voters; track voter.id) {
+              <div class="place-card__voter-avatar" [style.background]="voter.color" [title]="voter.name">
+                {{ voter.name[0] }}
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Expand toggle -->
       <button class="place-card__toggle" (click)="toggleExpanded($event)">
@@ -76,11 +91,16 @@ export class PlaceCardComponent {
   @Input() voteCount = 0;
   @Input() hasVoted = false;
   @Input() confirmedPlaceId: number | undefined;
+  @Input() voterIds: string[] = [];
   @Output() select = new EventEmitter<void>();
   @Output() vote = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<void>();
 
   expanded = false;
+
+  get voters(): Friend[] {
+    return this.friends.filter(f => this.voterIds.includes(f.id));
+  }
 
   getEmoji(): string {
     return PLACE_TYPE_EMOJIS[this.place.placeType] || "📍";

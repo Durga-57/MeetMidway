@@ -32,6 +32,7 @@ import { PlaceCardComponent } from "../place-card/place-card";
               [voteCount]="votes[voteKey(place.id)]?.length || 0"
               [hasVoted]="!!currentVoterId && (votes[voteKey(place.id)] || []).includes(currentVoterId)"
               [confirmedPlaceId]="confirmedPlaceId"
+              [voterIds]="votes[voteKey(place.id)] || []"
               (select)="onSelectPlace(place.id)"
               (vote)="vote.emit(place.id)"
               (confirm)="confirm.emit(place.id)"
