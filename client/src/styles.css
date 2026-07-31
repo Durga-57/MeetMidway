@@ -78,19 +78,23 @@ html.dark .btn-primary:hover:not(:disabled) { background: #fff; border-color: #f
 html.dark .brand-mark, html.dark .auth-brand img { filter: none; }
 .trip-brand-logo { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-size: 14px; font-weight: 600; letter-spacing: -0.02em; }.trip-brand-logo:hover { color: var(--text); text-decoration: none; }.trip-brand-logo img { width: 26px; height: 26px; object-fit: contain; filter: brightness(0); }html.dark .trip-brand-logo img { filter: none; }.navbar .navbar__brand { display: none; }
 
-.trip-shell { grid-template-columns: minmax(520px, 1.2fr) minmax(320px, 0.8fr); }
-.trip-shell__sidebar { padding: 24px; gap: 20px; }
-.trip-shell__map { min-height: 360px; }
-.trip-shell__map--compact { min-height: 280px; }
+.trip-shell { grid-template-columns: minmax(600px, 2fr) minmax(250px, 1fr); gap: 16px; }
+.trip-shell__sidebar { padding: 24px; gap: 20px; background: var(--surface); }
+.trip-shell__map { min-height: 450px; }
+.trip-shell__map--compact { min-height: 350px; }
 .place-card__actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
 .place-card__voters { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 12px; background: var(--surface-alt); border-radius: var(--radius-sm); }
 .place-card__voters-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 .place-card__voters-list { display: flex; gap: 4px; }
 .place-card__voter-avatar { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 600; color: white; border: 2px solid var(--surface); }
+.place-list { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.place-list > div { flex: 1; }
 .place-vote-btn, .place-confirm-btn { min-height: 32px; border-radius: 6px; padding: 5px 9px; font: 500 12px/20px var(--font); cursor: pointer; }
 .place-vote-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); }.place-vote-btn:hover, .place-vote-btn.active { border-color: var(--text); background: var(--text); color: var(--surface); }.place-vote-btn .heart-icon { font-size: 16px; }.place-vote-btn span { margin-left: 4px; font-family: var(--font-mono); }.place-vote-btn:disabled { cursor: default; opacity: 0.7; }
 .place-confirm-btn { border: 0; background: transparent; color: var(--accent); }.place-confirm-btn:hover { text-decoration: underline; }.place-confirmed { color: var(--success); font: 500 12px/20px var(--font-mono); }
-@media (max-width: 900px) { .trip-shell { grid-template-columns: 1fr; }.trip-shell__map { min-height: 42vh; }.trip-shell__sidebar { max-height: none; } }
+@media (max-width: 900px) { .trip-shell { grid-template-columns: 1fr; }.trip-shell__map { min-height: 42vh; order: -1; }.trip-shell__sidebar { max-height: none; } }
+
+@media (min-width: 1200px) { .trip-shell { grid-template-columns: minmax(700px, 2.2fr) minmax(280px, 1fr); } }
 
 .home-hero { position: relative; overflow: hidden; padding: 112px 0 96px; border-bottom: 0; }
 .home-hero::before { content: ''; position: absolute; width: 680px; height: 450px; right: -180px; top: -200px; opacity: 0.18; filter: blur(48px); background: radial-gradient(circle at 18% 35%, #00dfd8 0 8%, transparent 31%), radial-gradient(circle at 53% 53%, #007cf0 0 12%, transparent 39%), radial-gradient(circle at 75% 35%, #7928ca 0 11%, transparent 37%), radial-gradient(circle at 70% 76%, #ff0080 0 8%, transparent 31%), radial-gradient(circle at 35% 80%, #f9cb28 0 7%, transparent 25%); pointer-events: none; }
