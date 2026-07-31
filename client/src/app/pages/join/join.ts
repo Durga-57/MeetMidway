@@ -4,21 +4,22 @@ import { FormsModule } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { TripService } from "../../services/trip.service";
 import { GeocoderService, GeoResult } from "../../services/geocoder.service";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: "app-join",
   standalone: true,
   imports: [RouterLink, FormsModule],
   template: `
-    <div class="page-shell">
-      <section class="home-hero create-hero">
+    <div class="page-shell page-shell--centered trip-form-page">
+      <section class="home-hero create-hero auth-panel trip-form-panel">
         <a routerLink="/" class="btn btn-link create-back">← Back to home</a>
 
         <h1 class="home-hero__title">Join a <span class="accent">trip session</span></h1>
         @if (tripName) {
           <p class="home-hero__subtitle">Joining: <strong>{{ tripName }}</strong></p>
         } @else {
-          <p class="home-hero__subtitle">Enter the invite code, your name, and your starting address.</p>
+          <p class="home-hero__subtitle">You&rsquo;re joining as <strong>{{ auth.displayName() }}</strong>. Enter the invite code and your starting address.</p>
         }
 
         <div class="card create-card">
@@ -36,20 +37,6 @@ import { GeocoderService, GeoResult } from "../../services/geocoder.service";
                   [(ngModel)]="code"
                   (ngModelChange)="onCodeChange($event)"
                   maxLength="6"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="friend-name" class="form-label">Your name</label>
-                <input
-                  id="friend-name"
-                  type="text"
-                  name="name"
-                  class="form-input"
-                  placeholder="Alex"
-                  [(ngModel)]="name"
-                  maxLength="40"
                   required
                 />
               </div>
@@ -105,7 +92,7 @@ import { GeocoderService, GeoResult } from "../../services/geocoder.service";
             <button
               type="submit"
               class="btn btn-primary btn-full"
-              [disabled]="loading || !code.trim() || !name.trim() || !address.trim()"
+              [disabled]="loading || !code.trim() || !address.trim()"
             >
               @if (loading) {
                 <div class="spinner spinner--sm spinner--white"></div>
@@ -127,7 +114,6 @@ import { GeocoderService, GeoResult } from "../../services/geocoder.service";
 })
 export class JoinComponent implements OnInit, OnDestroy {
   code = "";
-  name = "";
   address = "";
   addressError = "";
   tripError = "";
@@ -148,7 +134,8 @@ export class JoinComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private tripService: TripService,
-    private geocoderService: GeocoderService
+    private geocoderService: GeocoderService,
+    public auth: AuthService
   ) {}
 
   ngOnInit() {
@@ -233,14 +220,14 @@ export class JoinComponent implements OnInit, OnDestroy {
 
   loading = false;
   handleSubmit() {
-    if (!this.code.trim() || !this.name.trim() || !this.address.trim()) return;
+    if (!this.code.trim() || !this.address.trim()) return;
     this.loading = true;
     this.tripError = "";
     this.addressError = "";
 
     const cleanCode = this.code.trim().toUpperCase();
 
-    this.tripService.addFriend(cleanCode, this.name.trim(), this.address.trim()).subscribe({
+    this.tripService.addFriend(cleanCode, this.auth.displayName(), this.address.trim()).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate([`/trip/${cleanCode}`]);

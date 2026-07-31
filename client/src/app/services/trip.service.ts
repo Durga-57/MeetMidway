@@ -44,4 +44,12 @@ export class TripService {
       { placeType, radiusKm }
     );
   }
+
+  voteForPlace(code: string, placeId: number, voterId: string): Observable<{ trip: Trip }> {
+    return this.http.post<{ trip: Trip }>(`${this.api}/api/trips/${code}/votes`, { placeId, voterId });
+  }
+
+  confirmPlace(code: string, placeId: number): Observable<{ trip: Trip }> {
+    return this.http.post<{ trip: Trip }>(`${this.api}/api/trips/${code}/confirm`, { placeId });
+  }
 }

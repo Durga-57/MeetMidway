@@ -102,6 +102,8 @@ function tripsRouter(io) {
             friends: [creator],
             createdAt: now,
             expiresAt: now + 86400 * 1000,
+            places: [],
+            votes: {},
         };
         await (0, redis_1.saveTrip)(trip);
         return res.status(201).json({ code, trip });
@@ -223,6 +225,14 @@ function tripsRouter(io) {
                 return res.json({ places: [], midpoint });
             }
             const places = (0, scoring_1.scorePlaces)(rawPlaces, trip.friends, type, midpoint);
+            const currentPlaceIds = new Set(places.map((place) => String(place.id)));
+            trip.places = places;
+            trip.midpoint = midpoint;
+            trip.votes = Object.fromEntries(Object.entries(trip.votes ?? {}).filter(([placeId]) => currentPlaceIds.has(placeId)));
+            if (trip.confirmedPlaceId && !currentPlaceIds.has(String(trip.confirmedPlaceId))) {
+                trip.confirmedPlaceId = undefined;
+            }
+            await (0, redis_1.saveTrip)(trip);
             io.to(code).emit("places:results", { places, midpoint });
             return res.json({ places, midpoint });
         }
@@ -230,6 +240,48 @@ function tripsRouter(io) {
             console.error("Overpass error:", err.message);
             return res.status(502).json({ error: "Place search failed" });
         }
+    });
+    router.post("/:code/votes", async (req, res) => {
+        const code = req.params.code.toUpperCase();
+        const placeId = Number(req.body?.placeId);
+        const voterId = normalizeText(req.body?.voterId);
+        const trip = await (0, redis_1.getTrip)(code);
+        if (!trip)
+            return res.status(404).json({ error: "Trip not found" });
+        if (!voterId || !Number.isFinite(placeId)) {
+            return res.status(400).json({ error: "placeId and voterId are required" });
+        }
+        if (!trip.places?.some((place) => place.id === placeId)) {
+            return res.status(404).json({ error: "Place not found in this trip" });
+        }
+        const votes = { ...(trip.votes ?? {}) };
+        const placeKey = String(placeId);
+        const alreadyVoted = (votes[placeKey] ?? []).includes(voterId);
+        for (const key of Object.keys(votes)) {
+            votes[key] = votes[key].filter((id) => id !== voterId);
+            if (votes[key].length === 0)
+                delete votes[key];
+        }
+        if (!alreadyVoted)
+            votes[placeKey] = [...(votes[placeKey] ?? []), voterId];
+        trip.votes = votes;
+        await (0, redis_1.saveTrip)(trip);
+        io.to(code).emit("trip:state", { trip });
+        return res.json({ trip });
+    });
+    router.post("/:code/confirm", async (req, res) => {
+        const code = req.params.code.toUpperCase();
+        const placeId = Number(req.body?.placeId);
+        const trip = await (0, redis_1.getTrip)(code);
+        if (!trip)
+            return res.status(404).json({ error: "Trip not found" });
+        if (!Number.isFinite(placeId) || !trip.places?.some((place) => place.id === placeId)) {
+            return res.status(404).json({ error: "Place not found in this trip" });
+        }
+        trip.confirmedPlaceId = placeId;
+        await (0, redis_1.saveTrip)(trip);
+        io.to(code).emit("trip:state", { trip });
+        return res.json({ trip });
     });
     return router;
 }

@@ -64,6 +64,7 @@ export class SocketService {
       this.ngZone.run(() => {
         console.log("SocketService: received event trip:state", trip);
         this.store.setTrip(trip);
+        if (trip.places && trip.midpoint) this.store.setPlaces(trip.places, trip.midpoint);
       });
     });
 

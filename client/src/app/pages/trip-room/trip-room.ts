@@ -14,6 +14,7 @@ import { PlaceListComponent } from "../../components/place-list/place-list";
 import { SearchControlsComponent } from "../../components/search-controls/search-controls";
 import { TripCodeBadgeComponent } from "../../components/trip-code-badge/trip-code-badge";
 import { NgZone } from "@angular/core";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: "app-trip-room",
@@ -43,6 +44,7 @@ import { NgZone } from "@angular/core";
       <div class="page-shell--split">
         <!-- Navbar -->
         <nav class="navbar">
+          <a routerLink="/" class="trip-brand-logo"><img src="/octopus.png" alt="" /><span>MeetMidway</span></a>
           <a routerLink="/" class="navbar__brand">📍 MeetMidway</a>
           <span class="navbar__trip-name">{{ trip.name }}</span>
           <div class="navbar__code">{{ code }}</div>
@@ -161,7 +163,12 @@ import { NgZone } from "@angular/core";
                 [friends]="trip.friends"
                 [isSearching]="isSearching"
                 [searchError]="searchError"
+                [votes]="trip.votes || {}"
+                [currentVoterId]="auth.session()?.user?.id || ''"
+                [confirmedPlaceId]="trip.confirmedPlaceId"
                 (retry)="handleSearch()"
+                (vote)="handleVote($event)"
+                (confirm)="handleConfirm($event)"
               ></app-place-list>
             }
           </aside>
@@ -229,9 +236,10 @@ export class TripRoomComponent implements OnInit, AfterViewChecked, OnDestroy {
     private tripService: TripService,
     private socketService: SocketService,
     private geocoderService: GeocoderService,
+    public auth: AuthService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     const tripCode = this.activatedRoute.snapshot.paramMap.get("code");
@@ -248,6 +256,7 @@ export class TripRoomComponent implements OnInit, AfterViewChecked, OnDestroy {
           this.notFound = true;
         } else {
           this.store.setTrip(res.trip);
+          if (res.trip.places && res.trip.midpoint) this.store.setPlaces(res.trip.places, res.trip.midpoint);
           this.socketService.joinRoom(this.code);
         }
         this.cdr.markForCheck();
@@ -387,6 +396,23 @@ export class TripRoomComponent implements OnInit, AfterViewChecked, OnDestroy {
         this.store.setIsSearching(false);
         this.store.setSearchError(err.error?.error || "Search failed. Try again.");
       },
+    });
+  }
+
+  handleVote(placeId: number) {
+    const voterId = this.auth.session()?.user.id;
+    if (!this.code || !voterId) return;
+    this.tripService.voteForPlace(this.code, placeId, voterId).subscribe({
+      next: ({ trip }) => this.store.setTrip(trip),
+      error: (err) => this.store.setSearchError(err.error?.error || 'Unable to save your vote.')
+    });
+  }
+
+  handleConfirm(placeId: number) {
+    if (!this.code || !confirm('Lock this spot for the group?')) return;
+    this.tripService.confirmPlace(this.code, placeId).subscribe({
+      next: ({ trip }) => this.store.setTrip(trip),
+      error: (err) => this.store.setSearchError(err.error?.error || 'Unable to confirm this spot.')
     });
   }
 }

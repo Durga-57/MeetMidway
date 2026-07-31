@@ -25,6 +25,10 @@ export interface Trip {
   friends: Friend[];
   createdAt: number;
   expiresAt: number;
+  places?: ScoredPlace[];
+  midpoint?: Midpoint;
+  votes?: Record<string, string[]>;
+  confirmedPlaceId?: number;
 }
 
 export interface ScoredPlace {

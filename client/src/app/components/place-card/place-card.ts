@@ -28,6 +28,17 @@ import { formatDistance } from "../../utils/geo";
         <div class="place-card__rank" [class.rank-top]="rank === 0">#{{ rank + 1 }}</div>
       </div>
 
+      <div class="place-card__actions" (click)="$event.stopPropagation()">
+        <button class="place-vote-btn" type="button" [class.active]="hasVoted" (click)="vote.emit()" [disabled]="!!confirmedPlaceId">
+          {{ hasVoted ? 'Voted' : 'Vote for this' }} <span>{{ voteCount }}</span>
+        </button>
+        @if (confirmedPlaceId === place.id) {
+          <span class="place-confirmed">Confirmed spot</span>
+        } @else if (!confirmedPlaceId) {
+          <button class="place-confirm-btn" type="button" (click)="confirm.emit()">Lock this spot</button>
+        }
+      </div>
+
       <!-- Expand toggle -->
       <button class="place-card__toggle" (click)="toggleExpanded($event)">
         <span>{{ expanded ? "▴" : "▾" }}</span>
@@ -62,7 +73,12 @@ export class PlaceCardComponent {
   @Input() rank!: number;
   @Input() friends: Friend[] = [];
   @Input() isSelected = false;
+  @Input() voteCount = 0;
+  @Input() hasVoted = false;
+  @Input() confirmedPlaceId: number | undefined;
   @Output() select = new EventEmitter<void>();
+  @Output() vote = new EventEmitter<void>();
+  @Output() confirm = new EventEmitter<void>();
 
   expanded = false;
 
