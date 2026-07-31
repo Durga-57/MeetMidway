@@ -14,7 +14,13 @@ declare global {
 export class AuthService {
   private readonly config = window.__MEETMIDWAY_CONFIG__ ?? {};
   private readonly client: SupabaseClient | null = this.config.supabaseUrl && this.config.supabasePublishableKey
-    ? createClient(this.config.supabaseUrl, this.config.supabasePublishableKey)
+    ? createClient(this.config.supabaseUrl, this.config.supabasePublishableKey, {
+        auth: {
+          detectSessionInUrl: true,
+          flowType: 'pkce',
+          autoRefreshToken: true,
+        }
+      })
     : null;
 
   readonly session = signal<Session | null>(null);
@@ -45,21 +51,43 @@ export class AuthService {
     const { data, error } = await client.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/auth/callback` }
+      options: { 
+        data: { full_name: fullName }, 
+        emailRedirectTo: `${window.location.origin}/auth/callback`
+      }
     });
     if (error) throw error;
-    return { confirmationRequired: !data.session };
+    
+    // If we have a session immediately, email confirmation is disabled
+    const confirmationRequired = !data.session;
+    
+    // If session exists, update our signal
+    if (data.session) {
+      this.session.set(data.session);
+    }
+    
+    return { confirmationRequired };
   }
 
   async signIn(email: string, password: string): Promise<void> {
-    const { error } = await this.requireClient().auth.signInWithPassword({ email, password });
+    const client = this.requireClient();
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error) throw error;
+    
+    // Update session signal
+    if (data.session) {
+      this.session.set(data.session);
+    }
   }
 
   async continueWithGoogle(): Promise<void> {
-    const { error } = await this.requireClient().auth.signInWithOAuth({
+    const client = this.requireClient();
+    const { error } = await client.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: { 
+        redirectTo: `${window.location.origin}/auth/callback`,
+        skipBrowserRedirect: false
+      }
     });
     if (error) throw error;
   }

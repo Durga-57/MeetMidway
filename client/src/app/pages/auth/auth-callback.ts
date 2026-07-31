@@ -6,5 +6,20 @@ import { AuthService } from '../../services/auth.service';
 export class AuthCallbackComponent {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
-  constructor() { setTimeout(() => this.router.navigateByUrl('/'), 800); }
+  
+  constructor() {
+    this.handleAuthCallback();
+  }
+
+  private async handleAuthCallback() {
+    try {
+      // Let Supabase handle the session from URL parameters
+      await this.auth.hasSession();
+      // Redirect to home after a short delay to ensure session is set
+      setTimeout(() => this.router.navigateByUrl('/'), 500);
+    } catch (error) {
+      console.error('Auth callback error:', error);
+      setTimeout(() => this.router.navigateByUrl('/auth'), 1000);
+    }
+  }
 }
