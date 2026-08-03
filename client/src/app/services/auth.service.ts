@@ -41,19 +41,42 @@ export class AuthService {
     return !!result.data.session;
   }
 
+  async completeAuthCallback(callbackUrl = window.location.href): Promise<{ session: Session | null; email: string | null }> {
+    const client = this.requireClient();
+    const url = new URL(callbackUrl);
+    const code = url.searchParams.get('code');
+
+    const existingSession = await client.auth.getSession();
+    if (existingSession.data.session) {
+      this.session.set(existingSession.data.session);
+      return { session: existingSession.data.session, email: existingSession.data.session.user.email ?? null };
+    }
+
+    if (code) {
+      const { data, error } = await client.auth.exchangeCodeForSession(code);
+      if (error) throw error;
+      this.session.set(data.session);
+      return { session: data.session, email: data.session?.user.email ?? null };
+    }
+
+    const session = await client.auth.getSession();
+    this.session.set(session.data.session);
+    return { session: session.data.session, email: session.data.session?.user.email ?? null };
+  }
+
   constructor() {
     this.client?.auth.getSession().then(({ data }) => this.session.set(data.session));
     this.client?.auth.onAuthStateChange((_event, session) => this.session.set(session));
   }
 
-  async signUp(email: string, password: string, fullName: string): Promise<{ confirmationRequired: boolean }> {
+  async signUp(email: string, password: string, fullName: string, nextPath?: string): Promise<{ confirmationRequired: boolean }> {
     const client = this.requireClient();
     const { data, error } = await client.auth.signUp({
       email,
       password,
       options: { 
         data: { full_name: fullName }, 
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: this.buildCallbackUrl(nextPath)
       }
     });
     if (error) throw error;
@@ -80,12 +103,12 @@ export class AuthService {
     }
   }
 
-  async continueWithGoogle(): Promise<void> {
+  async continueWithGoogle(nextPath?: string): Promise<void> {
     const client = this.requireClient();
     const { error } = await client.auth.signInWithOAuth({
       provider: 'google',
       options: { 
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: this.buildCallbackUrl(nextPath),
         skipBrowserRedirect: false
       }
     });
@@ -104,5 +127,13 @@ export class AuthService {
       throw new AuthError('Supabase is not configured yet. Add the project URL and publishable key to runtime configuration.');
     }
     return this.client;
+  }
+
+  private buildCallbackUrl(nextPath?: string): string {
+    const url = new URL('/auth/callback', window.location.origin);
+    if (nextPath) {
+      url.searchParams.set('next', nextPath);
+    }
+    return url.toString();
   }
 }

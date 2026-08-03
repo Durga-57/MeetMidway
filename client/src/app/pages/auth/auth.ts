@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -60,16 +60,40 @@ export class AuthComponent {
 
   constructor(private readonly auth: AuthService, private readonly router: Router, private readonly route: ActivatedRoute) {}
 
+  ngOnInit() {
+    const params = this.route.snapshot.queryParamMap;
+    const confirmed = params.get('confirmed') === '1';
+    const mode = params.get('mode');
+    const email = params.get('email');
+
+    if (email) {
+      this.email = email;
+    }
+
+    if (confirmed || mode === 'signin') {
+      this.mode = 'signin';
+      if (confirmed) {
+        this.message = 'Email confirmed. You can sign in now.';
+        this.isError = false;
+      }
+    }
+  }
+
   toggleMode() { this.mode = this.mode === 'signup' ? 'signin' : 'signup'; this.message = ''; }
 
-  async google() { await this.run(() => this.auth.continueWithGoogle()); }
+  async google() { await this.run(() => this.auth.continueWithGoogle(this.nextPath())); }
 
   async submit() {
     await this.run(async () => {
       if (this.mode === 'signup') {
-        const result = await this.auth.signUp(this.email.trim(), this.password, this.name.trim());
+        const result = await this.auth.signUp(this.email.trim(), this.password, this.name.trim(), this.nextPath());
         this.message = result.confirmationRequired ? 'Check your email to confirm your account.' : 'Your account is ready.';
-        if (!result.confirmationRequired) await this.goToNext();
+        if (result.confirmationRequired) {
+          this.mode = 'signin';
+          this.password = '';
+        } else {
+          await this.goToNext();
+        }
       } else {
         await this.auth.signIn(this.email.trim(), this.password);
         await this.goToNext();
@@ -84,6 +108,10 @@ export class AuthComponent {
   }
 
   private goToNext() {
-    return this.router.navigateByUrl(this.route.snapshot.queryParamMap.get('next') || '/');
+    return this.router.navigateByUrl(this.nextPath());
+  }
+
+  private nextPath() {
+    return this.route.snapshot.queryParamMap.get('next') || '/';
   }
 }
