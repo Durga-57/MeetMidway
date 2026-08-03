@@ -6,6 +6,7 @@ declare global {
     __MEETMIDWAY_CONFIG__?: {
       supabaseUrl?: string;
       supabasePublishableKey?: string;
+      clientUrl?: string;
     };
   }
 }
@@ -13,6 +14,7 @@ declare global {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly config = window.__MEETMIDWAY_CONFIG__ ?? {};
+  private readonly clientUrl = this.config.clientUrl || window.location.origin;
   private readonly client: SupabaseClient | null = this.config.supabaseUrl && this.config.supabasePublishableKey
     ? createClient(this.config.supabaseUrl, this.config.supabasePublishableKey, {
         auth: {
@@ -130,7 +132,7 @@ export class AuthService {
   }
 
   private buildCallbackUrl(nextPath?: string): string {
-    const url = new URL('/auth/callback', window.location.origin);
+    const url = new URL('/auth/callback', this.clientUrl);
     if (nextPath) {
       url.searchParams.set('next', nextPath);
     }

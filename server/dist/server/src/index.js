@@ -61,6 +61,15 @@ app.use((0, cors_1.default)({
 }));
 app.use((0, morgan_1.default)("dev"));
 app.use(express_1.default.json());
+app.get(["/auth/callback", "/auth/callback/"], (req, res) => {
+    const target = new URL("/auth/callback", `${clientUrl}/`);
+    for (const [key, value] of Object.entries(req.query)) {
+        if (typeof value === "string") {
+            target.searchParams.set(key, value);
+        }
+    }
+    res.redirect(target.toString());
+});
 // Routes
 app.use("/api/trips", (0, trips_1.tripsRouter)(io));
 app.use("/api/geocode", geocode_1.geocodeRouter);
