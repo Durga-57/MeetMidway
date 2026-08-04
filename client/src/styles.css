@@ -1972,15 +1972,12 @@ body,
   background: var(--surface);
   max-width: min(100%, 980px);
   margin-top: 1rem;
-  aspect-ratio: 16 / 10;
 }
 
 .home-mockup img {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  height: auto;
 }
 
 /* How it works */
@@ -2062,7 +2059,7 @@ body,
   }
 
   .home-mockup {
-    aspect-ratio: 16 / 11;
+    max-width: 100%;
   }
 }
 

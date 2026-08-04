@@ -154,7 +154,7 @@ import { AuthService } from '../../services/auth.service';
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                   </svg>
                 </div>
-                <div class="activity-empty__text">No recent activity yet. Start by creating your first trip!</div>
+                <div class="activity-empty__text">No recent activity yet. Once you create or join a trip, your latest actions will appear here.</div>
               </div>
             }
           </div>
@@ -220,44 +220,5 @@ export class HomeComponent implements OnInit {
   constructor(public theme: ThemeService, public auth: AuthService) { }
 
   ngOnInit() {
-    if (this.auth.session()) {
-      this.loadDashboardData();
-    }
-  }
-
-  private loadDashboardData() {
-    // TODO: Load real data from Supabase
-    // For now, using mock data
-    this.stats = {
-      totalTrips: 3,
-      totalFriends: 12,
-      activeTrips: 1,
-      placesVoted: 8
-    };
-
-    this.recentActivities = [
-      {
-        id: '1',
-        icon: 'created',
-        title: 'Created "Friday night dinner"',
-        time: '2 hours ago',
-        action: 'View trip',
-        actionLink: '/trip/ABC123'
-      },
-      {
-        id: '2',
-        icon: 'joined',
-        title: 'Joined "Team lunch" trip',
-        time: '1 day ago',
-        action: 'View trip',
-        actionLink: '/trip/XYZ789'
-      },
-      {
-        id: '3',
-        icon: 'voted',
-        title: 'Voted for "Mario\'s Pizza"',
-        time: '2 days ago'
-      }
-    ];
   }
 }
