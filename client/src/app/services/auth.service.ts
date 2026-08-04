@@ -50,6 +50,7 @@ export class AuthService {
 
     const existingSession = await client.auth.getSession();
     if (existingSession.data.session) {
+      this.ensureVerifiedSession(existingSession.data.session, 'Please verify your email before signing in.');
       this.session.set(existingSession.data.session);
       return { session: existingSession.data.session, email: existingSession.data.session.user.email ?? null };
     }
@@ -57,11 +58,13 @@ export class AuthService {
     if (code) {
       const { data, error } = await client.auth.exchangeCodeForSession(code);
       if (error) throw error;
+      this.ensureVerifiedSession(data.session, 'Please verify your email before continuing.');
       this.session.set(data.session);
       return { session: data.session, email: data.session?.user.email ?? null };
     }
 
     const session = await client.auth.getSession();
+    this.ensureVerifiedSession(session.data.session, 'Please verify your email before signing in.');
     this.session.set(session.data.session);
     return { session: session.data.session, email: session.data.session?.user.email ?? null };
   }
@@ -89,6 +92,7 @@ export class AuthService {
     
     // If session exists, update our signal
     if (data.session) {
+      this.ensureVerifiedSession(data.session, 'Please verify your email before using your account.');
       this.session.set(data.session);
     }
     
@@ -102,6 +106,7 @@ export class AuthService {
     
     // Update session signal
     if (data.session) {
+      this.ensureVerifiedSession(data.session, 'Please verify your email before signing in.');
       this.session.set(data.session);
     }
   }
@@ -134,9 +139,21 @@ export class AuthService {
     const client = this.requireClient();
     const { data } = await client.auth.getSession();
     if (data.session) {
+      this.ensureVerifiedSession(data.session, 'Please verify your email before continuing.');
       this.session.set(data.session);
     }
     return data.session?.access_token ?? null;
+  }
+
+  private ensureVerifiedSession(session: Session | null, message: string) {
+    if (!session) return;
+
+    const isEmailVerified = !!session.user.email_confirmed_at;
+    if (!isEmailVerified) {
+      void this.client?.auth.signOut();
+      this.session.set(null);
+      throw new AuthError(message);
+    }
   }
 
   private requireClient(): SupabaseClient {

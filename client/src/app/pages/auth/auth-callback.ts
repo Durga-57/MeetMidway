@@ -13,9 +13,9 @@ export class AuthCallbackComponent {
   }
 
   private async handleAuthCallback() {
+    const next = this.route.snapshot.queryParamMap.get('next') || '/';
     try {
       const result = await this.auth.completeAuthCallback();
-      const next = this.route.snapshot.queryParamMap.get('next') || '/';
 
       if (result.session) {
         const user = result.session.user;
@@ -35,7 +35,14 @@ export class AuthCallbackComponent {
       await this.router.navigateByUrl(authUrl);
     } catch (error) {
       console.error('Auth callback error:', error);
-      setTimeout(() => this.router.navigateByUrl('/auth'), 1000);
+      const verifyUrl = this.router.createUrlTree(['/auth'], {
+        queryParams: {
+          mode: 'signin',
+          notice: 'verify',
+          next
+        }
+      });
+      await this.router.navigateByUrl(verifyUrl);
     }
   }
 
