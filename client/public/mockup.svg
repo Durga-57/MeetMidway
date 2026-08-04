@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" role="img" aria-labelledby="title desc">
+  <title id="title">MeetMidway trip room preview</title>
+  <desc id="desc">A UI mockup showing a friends list, map markers, and place results.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc" />
+      <stop offset="1" stop-color="#eef2f7" />
+    </linearGradient>
+    <linearGradient id="mapBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e7efe3" />
+      <stop offset="1" stop-color="#dce7f3" />
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="860" height="540" fill="url(#bg)" />
+
+  <rect x="0" y="0" width="300" height="540" fill="#f3f4f6" />
+  <rect x="300" y="0" width="560" height="540" fill="url(#mapBg)" />
+
+  <rect x="0" y="0" width="860" height="52" fill="#1f2937" />
+  <text x="18" y="33" fill="#f9fafb" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="600">MeetMidway</text>
+  <text x="798" y="33" fill="#f9fafb" font-family="JetBrains Mono, Consolas, monospace" font-size="14" text-anchor="end">X7P2QA</text>
+
+  <text x="16" y="88" fill="#111827" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Friends</text>
+
+  <g transform="translate(16,102)">
+    <rect width="268" height="60" rx="8" fill="#ffffff" stroke="#d1d5db" />
+    <circle cx="24" cy="30" r="14" fill="#60a5fa" />
+    <text x="56" y="35" fill="#111827" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22">Alice</text>
+  </g>
+  <g transform="translate(16,166)">
+    <rect width="268" height="60" rx="8" fill="#ffffff" stroke="#d1d5db" />
+    <circle cx="24" cy="30" r="14" fill="#3b82f6" />
+    <text x="56" y="35" fill="#111827" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22">Bob</text>
+  </g>
+  <g transform="translate(16,230)">
+    <rect width="268" height="60" rx="8" fill="#ffffff" stroke="#d1d5db" />
+    <circle cx="24" cy="30" r="14" fill="#f59e0b" />
+    <text x="56" y="35" fill="#111827" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22">Carol</text>
+  </g>
+
+  <rect x="16" y="306" width="268" height="38" rx="6" fill="#1f2937" />
+  <text x="150" y="330" fill="#f9fafb" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" text-anchor="middle">Find places</text>
+
+  <rect x="16" y="358" width="268" height="74" rx="8" fill="#ffffff" stroke="#d1d5db" />
+  <text x="30" y="388" fill="#111827" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="600">Sakura Garden</text>
+  <text x="30" y="410" fill="#374151" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Fairness score: 4.5/5</text>
+
+  <g stroke="#c8d4bf" stroke-width="2" opacity="0.9">
+    <path d="M315 120 L845 120" />
+    <path d="M315 180 L845 180" />
+    <path d="M315 240 L845 240" />
+    <path d="M315 300 L845 300" />
+    <path d="M315 360 L845 360" />
+    <path d="M315 420 L845 420" />
+    <path d="M370 58 L370 530" />
+    <path d="M450 58 L450 530" />
+    <path d="M530 58 L530 530" />
+    <path d="M610 58 L610 530" />
+    <path d="M690 58 L690 530" />
+    <path d="M770 58 L770 530" />
+  </g>
+
+  <circle cx="420" cy="235" r="18" fill="#43a047" />
+  <text x="420" y="241" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="700">A</text>
+
+  <circle cx="655" cy="190" r="18" fill="#3b82f6" />
+  <text x="655" y="196" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="700">B</text>
+
+  <circle cx="640" cy="362" r="18" fill="#fb923c" />
+  <text x="640" y="368" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" text-anchor="middle" font-weight="700">C</text>
+
+  <circle cx="550" cy="282" r="14" fill="#2563eb" />
+  <text x="550" y="287" fill="#ffffff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" text-anchor="middle" font-weight="700">M</text>
+</svg>
