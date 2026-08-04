@@ -18,6 +18,8 @@ export class AuthCallbackComponent {
       const next = this.route.snapshot.queryParamMap.get('next') || '/';
 
       if (result.session) {
+        const user = result.session.user;
+        this.setWelcomeFlag(this.isLikelyNewUser(user.created_at, user.last_sign_in_at) ? 'new' : 'returning');
         await this.router.navigateByUrl(next);
         return;
       }
@@ -35,5 +37,20 @@ export class AuthCallbackComponent {
       console.error('Auth callback error:', error);
       setTimeout(() => this.router.navigateByUrl('/auth'), 1000);
     }
+  }
+
+  private setWelcomeFlag(type: 'new' | 'returning') {
+    sessionStorage.setItem('mm_welcome', type);
+    sessionStorage.setItem('mm_welcome_name', this.auth.displayName());
+  }
+
+  private isLikelyNewUser(createdAt?: string, lastSignInAt?: string): boolean {
+    if (!createdAt || !lastSignInAt) return false;
+
+    const created = new Date(createdAt).getTime();
+    const lastSignIn = new Date(lastSignInAt).getTime();
+    if (!Number.isFinite(created) || !Number.isFinite(lastSignIn)) return false;
+
+    return Math.abs(created - lastSignIn) <= 5000;
   }
 }

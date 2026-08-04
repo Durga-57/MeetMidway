@@ -92,10 +92,13 @@ export class AuthComponent {
           this.mode = 'signin';
           this.password = '';
         } else {
+          const firstName = this.firstName(this.name.trim()) || this.auth.displayName();
+          this.setWelcomeFlag(result.isNewUser ? 'new' : 'returning', firstName);
           await this.goToNext();
         }
       } else {
         await this.auth.signIn(this.email.trim(), this.password);
+        this.setWelcomeFlag('returning', this.auth.displayName());
         await this.goToNext();
       }
     });
@@ -113,5 +116,14 @@ export class AuthComponent {
 
   private nextPath() {
     return this.route.snapshot.queryParamMap.get('next') || '/';
+  }
+
+  private setWelcomeFlag(type: 'new' | 'returning', name: string) {
+    sessionStorage.setItem('mm_welcome', type);
+    sessionStorage.setItem('mm_welcome_name', name || 'there');
+  }
+
+  private firstName(name: string): string {
+    return name.split(/\s+/)[0] || '';
   }
 }

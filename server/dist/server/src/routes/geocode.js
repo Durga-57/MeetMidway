@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.geocodeRouter = void 0;
 const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
 exports.geocodeRouter = (0, express_1.Router)();
+exports.geocodeRouter.use(auth_1.requireAuth);
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
 const USER_AGENT = "MeetMidway/1.0";
 exports.geocodeRouter.get("/", async (req, res) => {

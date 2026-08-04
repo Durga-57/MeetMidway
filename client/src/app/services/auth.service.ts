@@ -71,7 +71,7 @@ export class AuthService {
     this.client?.auth.onAuthStateChange((_event, session) => this.session.set(session));
   }
 
-  async signUp(email: string, password: string, fullName: string, nextPath?: string): Promise<{ confirmationRequired: boolean }> {
+  async signUp(email: string, password: string, fullName: string, nextPath?: string): Promise<{ confirmationRequired: boolean; isNewUser: boolean }> {
     const client = this.requireClient();
     const { data, error } = await client.auth.signUp({
       email,
@@ -83,15 +83,16 @@ export class AuthService {
     });
     if (error) throw error;
     
-    // If we have a session immediately, email confirmation is disabled
+    // If we have a session immediately, email confirmation is disabled.
     const confirmationRequired = !data.session;
+    const isNewUser = !!data.session && !!data.user;
     
     // If session exists, update our signal
     if (data.session) {
       this.session.set(data.session);
     }
     
-    return { confirmationRequired };
+    return { confirmationRequired, isNewUser };
   }
 
   async signIn(email: string, password: string): Promise<void> {
@@ -122,6 +123,20 @@ export class AuthService {
     const { error } = await client.auth.signOut();
     if (error) throw error;
     this.session.set(null);
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    const currentSession = this.session();
+    if (currentSession?.access_token) {
+      return currentSession.access_token;
+    }
+
+    const client = this.requireClient();
+    const { data } = await client.auth.getSession();
+    if (data.session) {
+      this.session.set(data.session);
+    }
+    return data.session?.access_token ?? null;
   }
 
   private requireClient(): SupabaseClient {

@@ -7,6 +7,7 @@ const types_1 = require("../../../shared/types");
 const redis_1 = require("../services/redis");
 const scoring_1 = require("../services/scoring");
 const overpass_1 = require("../services/overpass");
+const auth_1 = require("../middleware/auth");
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
 const USER_AGENT = "MeetMidway/1.0";
 function generateCode() {
@@ -65,7 +66,7 @@ async function buildFriend(name, address, colorIndex) {
 function tripsRouter(io) {
     const router = (0, express_1.Router)();
     // POST /api/trips — create a new trip
-    router.post("/", async (req, res) => {
+    router.post("/", auth_1.requireAuth, async (req, res) => {
         const { name, placeType } = req.body;
         const tripName = normalizeText(name);
         const creatorName = normalizeText(req.body?.creatorName);
@@ -116,7 +117,7 @@ function tripsRouter(io) {
         return res.json({ trip });
     });
     // POST /api/trips/:code/friends — add a friend
-    router.post("/:code/friends", async (req, res) => {
+    router.post("/:code/friends", auth_1.requireAuth, async (req, res) => {
         const code = req.params.code.toUpperCase();
         const { name, address } = req.body;
         const friendName = normalizeText(name);
@@ -163,7 +164,7 @@ function tripsRouter(io) {
         return res.status(201).json({ friend, trip });
     });
     // DELETE /api/trips/:code/friends/:friendId — remove a friend
-    router.delete("/:code/friends/:friendId", async (req, res) => {
+    router.delete("/:code/friends/:friendId", auth_1.requireAuth, async (req, res) => {
         const code = req.params.code.toUpperCase();
         const { friendId } = req.params;
         const trip = await (0, redis_1.getTrip)(code);
@@ -179,7 +180,7 @@ function tripsRouter(io) {
         return res.json({ trip });
     });
     // POST /api/trips/:code/search — find places
-    router.post("/:code/search", async (req, res) => {
+    router.post("/:code/search", auth_1.requireAuth, async (req, res) => {
         const code = req.params.code.toUpperCase();
         const { placeType, radiusKm } = req.body;
         const trip = await (0, redis_1.getTrip)(code);
@@ -241,7 +242,7 @@ function tripsRouter(io) {
             return res.status(502).json({ error: "Place search failed" });
         }
     });
-    router.post("/:code/votes", async (req, res) => {
+    router.post("/:code/votes", auth_1.requireAuth, async (req, res) => {
         const code = req.params.code.toUpperCase();
         const placeId = Number(req.body?.placeId);
         const voterId = normalizeText(req.body?.voterId);
@@ -269,7 +270,7 @@ function tripsRouter(io) {
         io.to(code).emit("trip:state", { trip });
         return res.json({ trip });
     });
-    router.post("/:code/confirm", async (req, res) => {
+    router.post("/:code/confirm", auth_1.requireAuth, async (req, res) => {
         const code = req.params.code.toUpperCase();
         const placeId = Number(req.body?.placeId);
         const trip = await (0, redis_1.getTrip)(code);

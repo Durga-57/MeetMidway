@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, of } from "rxjs";
 import { catchError, finalize, map } from "rxjs/operators";
 import { environment } from "../../environments/environment";
+import { AuthService } from "./auth.service";
 
 export interface GeoResult {
   lat: number;
@@ -22,16 +23,27 @@ export class GeocoderService {
   suggestions$ = this.suggestionsSubject.asObservable();
   loading$ = this.loadingSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
-  search(query: string) {
+  async search(query: string) {
     if (query.length < 3) {
       this.suggestionsSubject.next([]);
       return;
     }
+
+    const token = await this.auth.getAccessToken();
+    if (!token) {
+      this.suggestionsSubject.next([]);
+      return;
+    }
+
     this.loadingSubject.next(true);
     this.http
-      .get<GeoResult[]>(`${this.api}/api/geocode?q=${encodeURIComponent(query)}`)
+      .get<GeoResult[]>(`${this.api}/api/geocode?q=${encodeURIComponent(query)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .pipe(
         map((results) => results.slice(0, 5)),
         catchError(() => of([])),

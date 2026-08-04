@@ -1,6 +1,8 @@
 import { Router } from "express";
+import { requireAuth } from "../middleware/auth";
 
 export const geocodeRouter = Router();
+geocodeRouter.use(requireAuth);
 
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
 const USER_AGENT = "MeetMidway/1.0";

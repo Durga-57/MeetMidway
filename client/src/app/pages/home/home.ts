@@ -3,7 +3,8 @@ import { RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { AuthService } from '../../services/auth.service';
 
-@Component({ selector: 'app-home', standalone: true, imports: [RouterLink], template: `
+@Component({
+  selector: 'app-home', standalone: true, imports: [RouterLink], template: `
   <nav class="home-nav">
     <a routerLink="/" class="home-nav__brand"><img class="brand-mark" src="/octopus.png" alt="" /><span>MeetMidway</span></a>
     <div class="home-nav__spacer"></div>
@@ -207,7 +208,7 @@ export class HomeComponent implements OnInit {
     activeTrips: 0,
     placesVoted: 0
   };
-  
+
   recentActivities: Array<{
     id: string;
     icon: 'created' | 'joined' | 'voted';
@@ -217,7 +218,7 @@ export class HomeComponent implements OnInit {
     actionLink?: string;
   }> = [];
 
-  constructor(public theme: ThemeService, public auth: AuthService) {}
+  constructor(public theme: ThemeService, public auth: AuthService) { }
 
   ngOnInit() {
     if (this.auth.session()) {

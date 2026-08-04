@@ -5,6 +5,7 @@ import { Trip, PlaceType, Friend, FRIEND_COLORS, PLACE_TYPE_LABELS } from "../..
 import { getTrip, saveTrip } from "../services/redis";
 import { computeMidpoint, scorePlaces } from "../services/scoring";
 import { fetchNearbyPlaces } from "../services/overpass";
+import { requireAuth } from "../middleware/auth";
 
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/search";
 const USER_AGENT = "MeetMidway/1.0";
@@ -74,7 +75,7 @@ export function tripsRouter(io: Server): Router {
   const router = Router();
 
   // POST /api/trips — create a new trip
-  router.post("/", async (req: Request, res: Response) => {
+  router.post("/", requireAuth, async (req: Request, res: Response) => {
     const { name, placeType } = req.body as {
       name?: string;
       placeType?: PlaceType;
@@ -141,7 +142,7 @@ export function tripsRouter(io: Server): Router {
   });
 
   // POST /api/trips/:code/friends — add a friend
-  router.post("/:code/friends", async (req: Request, res: Response) => {
+  router.post("/:code/friends", requireAuth, async (req: Request, res: Response) => {
     const code = req.params.code.toUpperCase();
     const { name, address } = req.body as { name?: string; address?: string };
     const friendName = normalizeText(name);
@@ -199,6 +200,7 @@ export function tripsRouter(io: Server): Router {
   // DELETE /api/trips/:code/friends/:friendId — remove a friend
   router.delete(
     "/:code/friends/:friendId",
+    requireAuth,
     async (req: Request, res: Response) => {
       const code = req.params.code.toUpperCase();
       const { friendId } = req.params;
@@ -220,7 +222,7 @@ export function tripsRouter(io: Server): Router {
   );
 
   // POST /api/trips/:code/search — find places
-  router.post("/:code/search", async (req: Request, res: Response) => {
+  router.post("/:code/search", requireAuth, async (req: Request, res: Response) => {
     const code = req.params.code.toUpperCase();
     const { placeType, radiusKm } = req.body as {
       placeType?: PlaceType;
@@ -306,7 +308,7 @@ export function tripsRouter(io: Server): Router {
     }
   });
 
-  router.post("/:code/votes", async (req: Request, res: Response) => {
+  router.post("/:code/votes", requireAuth, async (req: Request, res: Response) => {
     const code = req.params.code.toUpperCase();
     const placeId = Number(req.body?.placeId);
     const voterId = normalizeText(req.body?.voterId);
@@ -336,7 +338,7 @@ export function tripsRouter(io: Server): Router {
     return res.json({ trip });
   });
 
-  router.post("/:code/confirm", async (req: Request, res: Response) => {
+  router.post("/:code/confirm", requireAuth, async (req: Request, res: Response) => {
     const code = req.params.code.toUpperCase();
     const placeId = Number(req.body?.placeId);
     const trip = await getTrip(code);
