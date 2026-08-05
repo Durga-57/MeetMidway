@@ -31,6 +31,7 @@ function memDel(code: string): void {
 // ── Redis client ───────────────────────────────────────────────────────────────
 let redisAvailable = false;
 let redis: Redis | null = null;
+let redisReady: Promise<void> = Promise.resolve();
 
 try {
   redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379", {
@@ -58,7 +59,7 @@ try {
   });
 
   // Attempt connection
-  redis.connect().catch(() => {
+  redisReady = redis.connect().catch(() => {
     redisAvailable = false;
     console.warn("⚠️  Redis unavailable — using in-memory store (data won't persist across restarts)");
   });
@@ -71,6 +72,7 @@ try {
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 export async function saveTrip(trip: Trip): Promise<void> {
+  await redisReady;
   if (redis && redisAvailable) {
     try {
       await redis.set(`trip:${trip.code}`, JSON.stringify(trip), "EX", TRIP_TTL);
@@ -83,6 +85,7 @@ export async function saveTrip(trip: Trip): Promise<void> {
 }
 
 export async function getTrip(code: string): Promise<Trip | null> {
+  await redisReady;
   if (redis && redisAvailable) {
     try {
       const raw = await redis.get(`trip:${code}`);
@@ -96,6 +99,7 @@ export async function getTrip(code: string): Promise<Trip | null> {
 }
 
 export async function deleteTrip(code: string): Promise<void> {
+  await redisReady;
   if (redis && redisAvailable) {
     try {
       await redis.del(`trip:${code}`);
