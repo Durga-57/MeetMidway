@@ -1,53 +1,73 @@
 # MeetMidway
 
-MeetMidway is a full-stack app for finding a fair meetup location between friends. The Angular client lives in `client/` and the Node/Socket.IO backend lives in `server/`.
+> A fairer way to decide where everyone should meet.
 
-## Local setup
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-meet--midway--nu.vercel.app-2563eb?style=flat-square)](https://meet-midway-nu.vercel.app/)
 
-1. Install dependencies from the repo root:
+MeetMidway helps groups find a meetup location that works for everyone. Participants share their starting points, the app calculates a balanced midpoint, recommends nearby places, and gives the group a simple voting workspace to make the final decision together.
+
+## Live Demo
+
+**Try the app:** [meet-midway-nu.vercel.app](https://meet-midway-nu.vercel.app/)
+
+## Why MeetMidway?
+
+Choosing a place for a group often becomes a compromise driven by whoever speaks first. MeetMidway makes the trade-offs visible by ranking places according to how fairly the group can reach them.
+
+## Core Features
+
+- Create a trip and share it with an invite code or join link.
+- Add participant names and starting addresses.
+- Visualize participant locations and the calculated midpoint on a map.
+- Search nearby restaurants, cafés, cinemas, parks, bars, museums, and more.
+- Rank recommendations using travel fairness and midpoint proximity.
+- Vote on places with live group updates.
+- Preserve trip state with persistent Redis storage in production.
+- Provide validation and clear error states across the client and API.
+
+## Technical Highlight
+
+Recommendations are ranked with a fairness score that considers each participant’s travel distance, the maximum distance in the group, the spread between participants, and the venue’s distance from the calculated midpoint. Search results and voting updates are synchronized through Socket.IO so every participant sees the same decision state in real time.
+
+## Tech Stack
+
+**Frontend:** Angular, TypeScript, RxJS, Leaflet
+**Backend:** Node.js, Express, TypeScript, Socket.IO
+**Data and maps:** Redis, OpenStreetMap, Nominatim, Overpass API
+
+## Local Setup
+
+Install dependencies from the repository root:
 
 ```bash
 npm run install:all
 ```
 
-2. Create local env files from the examples below and keep the real files out of git:
+Create the local server environment file:
 
 ```bash
 copy server\.env.example server\.env
 ```
 
-3. Start the app:
+Start the client and API:
 
 ```bash
 npm run dev
 ```
 
-The client runs on `http://localhost:4200` and the API on `http://localhost:3000` by default.
+The client runs on `http://localhost:4200` and the API runs on `http://localhost:3000` by default.
 
-## Environment files
-
-- `server/.env` is local only and is ignored by git.
-- `client-react-backup/.env` is also local only and is ignored by git.
-- If you add additional local config, use `.env.example` files and keep the real values out of the repo.
-
-## Deployment notes
-
-- Host both client and server behind HTTPS. Most platforms provide HTTPS automatically.
-- Set the backend `CLIENT_URL` to the deployed frontend origin.
-- Configure a persistent production `REDIS_URL` for the backend. The in-memory fallback is for local development only; it loses trips when the server restarts.
-- For Vercel + Render, set the frontend build environment variables `MEETMIDWAY_API_URL` and `MEETMIDWAY_SOCKET_URL` to the Render backend URL, for example `https://your-render-service.onrender.com`. The client defaults to the current backend at `https://meetmidway.onrender.com` when these variables are omitted.
-- Keep the backend `CLIENT_URL` pointed at the Vercel frontend origin so CORS and Socket.IO accept the browser app.
-- The environment variables remain recommended for changing backend hosts; without them, production uses the current Render backend and local development uses `http://localhost:3000`.
-- There is no login flow in this repo, so there are no passwords to store. If you add auth later, hash passwords before storage.
-
-## Security and validation
-
-- Trip names, participant names, addresses, and place categories are validated on both the client and server.
-- The creator is added to the trip once at session creation, which avoids the old manual "Add me" loop.
-- Error states are returned as friendly JSON messages instead of stack traces.
-
-## Demo flow
+## Demo Flow
 
 1. Create a trip with your name and starting address.
-2. Share the invite code or join link with others.
-3. Add participants in the room and run a live place search to show the Socket.IO updates.
+2. Share the invite code or join link with friends.
+3. Add the group’s starting points.
+4. Choose a category and search radius.
+5. Review the ranked recommendations and vote together.
+
+## Deployment Notes
+
+- Host the client and server behind HTTPS.
+- Set the backend `CLIENT_URL` to the deployed frontend origin.
+- Configure a persistent production `REDIS_URL`; the in-memory fallback is intended only for local development.
+- For a Vercel frontend and Render backend, set `MEETMIDWAY_API_URL` and `MEETMIDWAY_SOCKET_URL` to the backend URL.
