@@ -199,6 +199,18 @@ import { DashboardService } from '../../services/dashboard.service';
               (confirm)="handleConfirm($event)"
             ></app-place-list>
           </section>
+        } @else {
+          <section class="trip-shell__results recommendations-panel recommendations-panel--empty" aria-labelledby="recommendations-empty-title">
+            <div class="recommendations-empty__icon" aria-hidden="true">⌖</div>
+            <p class="section-label">Recommendations</p>
+            <h2 id="recommendations-empty-title">Your options will appear here</h2>
+            <p class="recommendations-panel__intro">Add the group’s starting points, then find nearby places ranked by how fairly everyone can reach them.</p>
+            <div class="recommendations-empty__steps">
+              <div><strong>1</strong><span>Add at least two participants</span></div>
+              <div><strong>2</strong><span>Choose a category and radius</span></div>
+              <div><strong>3</strong><span>Click Find places</span></div>
+            </div>
+          </section>
         }
         </div>
       </div>

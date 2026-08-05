@@ -2056,17 +2056,90 @@ body,
 }
 
 .trip-shell__map {
-  grid-column: auto !important;
+  grid-column: 2 / 4 !important;
   min-height: 0;
 }
 
 .trip-shell__results {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: stretch;
+  width: auto;
+  margin: 1rem;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: var(--radius-lg);
   height: auto;
   overflow-y: auto;
+  z-index: 500;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
 }
 
 .trip-shell__results .recommendations-panel__header {
   margin-bottom: 1rem;
+}
+
+.recommendations-panel--empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.recommendations-panel--empty h2 {
+  max-width: 13ch;
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1.12;
+}
+
+.recommendations-panel--empty .recommendations-panel__intro {
+  max-width: 34ch;
+  line-height: 1.65;
+}
+
+.recommendations-empty__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border-dark);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 24px;
+}
+
+.recommendations-empty__steps {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.recommendations-empty__steps div {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.recommendations-empty__steps strong {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border-dark);
+  border-radius: 50%;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 
 @media (max-width: 1100px) {
@@ -2085,8 +2158,19 @@ body,
 
   .trip-shell__results {
     grid-column: 1 / -1;
+    grid-row: auto;
+    margin: 0;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    background: var(--surface);
+    backdrop-filter: none;
+    box-shadow: none;
     max-height: 55vh;
     overflow-y: auto;
+  }
+
+  .trip-shell__map {
+    grid-column: auto !important;
   }
 }
 
