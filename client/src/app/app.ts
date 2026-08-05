@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { WelcomeToastComponent } from './components/welcome-toast/welcome-toast';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,5 @@ import { WelcomeToastComponent } from './components/welcome-toast/welcome-toast'
   templateUrl: './app.html',
 })
 export class App {
+  constructor(private readonly theme: ThemeService) {}
 }

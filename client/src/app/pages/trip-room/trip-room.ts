@@ -87,7 +87,7 @@ import { DashboardService } from '../../services/dashboard.service';
                     class="form-input"
                     placeholder="Participant name"
                     [(ngModel)]="addName"
-                    maxLength="40"
+                        maxLength="40"
                     required
                   />
 
@@ -103,6 +103,7 @@ import { DashboardService } from '../../services/dashboard.service';
                         (ngModelChange)="handleAddressInput($event)"
                         (focus)="onAddressFocus()"
                         autocomplete="off"
+                        maxLength="240"
                         required
                       />
                       @if (geoLoading) {

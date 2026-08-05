@@ -83,8 +83,8 @@ function tripsRouter(io) {
         if (creatorName.length < 2 || creatorName.length > 40) {
             return res.status(400).json({ error: "Creator name must be between 2 and 40 characters" });
         }
-        if (creatorAddress.length < 3 || creatorAddress.length > 120) {
-            return res.status(400).json({ error: "Creator address must be between 3 and 120 characters" });
+        if (creatorAddress.length < 3 || creatorAddress.length > 240) {
+            return res.status(400).json({ error: "Creator address must be between 3 and 240 characters" });
         }
         let code = generateCode();
         // Ensure unique code
@@ -128,8 +128,8 @@ function tripsRouter(io) {
         if (friendName.length < 2 || friendName.length > 40) {
             return res.status(400).json({ error: "Name must be between 2 and 40 characters" });
         }
-        if (friendAddress.length < 3 || friendAddress.length > 120) {
-            return res.status(400).json({ error: "Address must be between 3 and 120 characters" });
+        if (friendAddress.length < 3 || friendAddress.length > 240) {
+            return res.status(400).json({ error: "Address must be between 3 and 240 characters" });
         }
         const trip = await (0, redis_1.getTrip)(code);
         if (!trip)

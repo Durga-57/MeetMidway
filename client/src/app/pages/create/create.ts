@@ -48,7 +48,7 @@ import { DashboardService } from '../../services/dashboard.service';
                   placeholder="123 Main St, New York, NY"
                   [(ngModel)]="creatorAddress"
                   (ngModelChange)="addressError = ''"
-                  maxLength="120"
+                  maxLength="240"
                   required
                 />
                 @if (addressError) {
@@ -142,7 +142,7 @@ export class CreateComponent {
       return;
     }
 
-    if (creatorAddress.length < 3 || creatorAddress.length > 120) {
+    if (creatorAddress.length < 3 || creatorAddress.length > 240) {
       this.addressError = "Please enter a real starting address.";
       return;
     }
