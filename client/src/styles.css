@@ -2029,6 +2029,80 @@ body,
   transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
+/* Final trip-room layout: keep the decision surface beside the map. */
+.page-shell--split {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trip-shell {
+  grid-template-columns: 280px minmax(0, 1.35fr) minmax(360px, 0.85fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: auto;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trip-shell__sidebar,
+.trip-shell__map,
+.trip-shell__results {
+  min-height: 0;
+}
+
+.trip-shell__sidebar {
+  overflow-y: auto;
+}
+
+.trip-shell__map {
+  grid-column: auto !important;
+  min-height: 0;
+}
+
+.trip-shell__results {
+  height: auto;
+  overflow-y: auto;
+}
+
+.trip-shell__results .recommendations-panel__header {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 1100px) {
+  .page-shell--split {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .trip-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  .trip-shell__results {
+    grid-column: 1 / -1;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .trip-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+  }
+
+  .trip-shell__results {
+    grid-column: auto;
+    max-height: none;
+  }
+}
+
 /* ─── Theme toggle button ────────────────────────────────────────────────── */
 .theme-toggle {
   background: none;
