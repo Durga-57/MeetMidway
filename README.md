@@ -34,9 +34,9 @@ The client runs on `http://localhost:4200` and the API on `http://localhost:3000
 
 - Host both client and server behind HTTPS. Most platforms provide HTTPS automatically.
 - Set the backend `CLIENT_URL` to the deployed frontend origin.
-- For Vercel + Render, set the frontend build environment variables `MEETMIDWAY_API_URL` and `MEETMIDWAY_SOCKET_URL` to the Render backend URL, for example `https://your-render-service.onrender.com`.
+- For Vercel + Render, set the frontend build environment variables `MEETMIDWAY_API_URL` and `MEETMIDWAY_SOCKET_URL` to the Render backend URL, for example `https://your-render-service.onrender.com`. The client defaults to the current backend at `https://meetmidway.onrender.com` when these variables are omitted.
 - Keep the backend `CLIENT_URL` pointed at the Vercel frontend origin so CORS and Socket.IO accept the browser app.
-- If you do not set the frontend backend URL, the app will assume same-origin, which only works when the backend is proxied behind the client host.
+- The environment variables remain recommended for changing backend hosts; without them, production uses the current Render backend and local development uses `http://localhost:3000`.
 - There is no login flow in this repo, so there are no passwords to store. If you add auth later, hash passwords before storage.
 
 ## Security and validation

@@ -12,11 +12,13 @@ const isLocalhost =
   typeof window !== "undefined" &&
   ["localhost", "127.0.0.1"].includes(window.location.hostname);
 
+const productionApiUrl = "https://meetmidway.onrender.com";
+
 const defaultApiUrl =
   typeof window !== "undefined"
     ? isLocalhost
       ? "http://localhost:3000"
-      : window.location.origin
+      : productionApiUrl
     : "http://localhost:3000";
 
 function normalizeUrl(url: string): string {
