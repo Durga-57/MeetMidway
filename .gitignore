@@ -9,7 +9,11 @@ tmp/
 out-tsc/
 coverage/
 
+# Dependencies
+node_modules/
+
 # Logs
 npm-debug.log
 yarn-error.log
+
 
