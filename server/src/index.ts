@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import { tripsRouter } from "./routes/trips";
 import { geocodeRouter } from "./routes/geocode";
 import { registerSocketHandlers } from "./socket/handlers";
+import { getTripStoreStatus } from "./services/redis";
 
 const app = express();
 const httpServer = createServer(app);
@@ -77,8 +78,13 @@ app.use("/api/trips", tripsRouter(io));
 app.use("/api/geocode", geocodeRouter);
 
 // Health check
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: Date.now() });
+app.get("/api/health", async (_req, res) => {
+  const storage = await getTripStoreStatus();
+  res.json({
+    status: storage === "redis" ? "ok" : "degraded",
+    storage,
+    timestamp: Date.now(),
+  });
 });
 
 // Socket.IO

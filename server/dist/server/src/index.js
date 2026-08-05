@@ -14,6 +14,7 @@ const socket_io_1 = require("socket.io");
 const trips_1 = require("./routes/trips");
 const geocode_1 = require("./routes/geocode");
 const handlers_1 = require("./socket/handlers");
+const redis_1 = require("./services/redis");
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 const clientUrl = (process.env.CLIENT_URL || "http://localhost:4200").trim().replace(/\/$/, "");
@@ -74,8 +75,13 @@ app.get(["/auth/callback", "/auth/callback/"], (req, res) => {
 app.use("/api/trips", (0, trips_1.tripsRouter)(io));
 app.use("/api/geocode", geocode_1.geocodeRouter);
 // Health check
-app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok", timestamp: Date.now() });
+app.get("/api/health", async (_req, res) => {
+    const storage = await (0, redis_1.getTripStoreStatus)();
+    res.json({
+        status: storage === "redis" ? "ok" : "degraded",
+        storage,
+        timestamp: Date.now(),
+    });
 });
 // Socket.IO
 (0, handlers_1.registerSocketHandlers)(io);

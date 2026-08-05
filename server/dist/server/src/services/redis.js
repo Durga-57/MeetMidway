@@ -7,6 +7,7 @@ exports.TRIP_TTL = void 0;
 exports.saveTrip = saveTrip;
 exports.getTrip = getTrip;
 exports.deleteTrip = deleteTrip;
+exports.getTripStoreStatus = getTripStoreStatus;
 const ioredis_1 = __importDefault(require("ioredis"));
 exports.TRIP_TTL = 86400; // 24 hours
 // ── In-memory fallback store ──────────────────────────────────────────────────
@@ -34,6 +35,7 @@ function memDel(code) {
 // ── Redis client ───────────────────────────────────────────────────────────────
 let redisAvailable = false;
 let redis = null;
+let redisReady = Promise.resolve();
 try {
     redis = new ioredis_1.default(process.env.REDIS_URL || "redis://localhost:6379", {
         lazyConnect: true,
@@ -57,7 +59,7 @@ try {
         redisAvailable = false;
     });
     // Attempt connection
-    redis.connect().catch(() => {
+    redisReady = redis.connect().catch(() => {
         redisAvailable = false;
         console.warn("⚠️  Redis unavailable — using in-memory store (data won't persist across restarts)");
     });
@@ -69,6 +71,7 @@ catch {
 }
 // ── Public API ─────────────────────────────────────────────────────────────────
 async function saveTrip(trip) {
+    await redisReady;
     if (redis && redisAvailable) {
         try {
             await redis.set(`trip:${trip.code}`, JSON.stringify(trip), "EX", exports.TRIP_TTL);
@@ -81,6 +84,7 @@ async function saveTrip(trip) {
     memSet(trip);
 }
 async function getTrip(code) {
+    await redisReady;
     if (redis && redisAvailable) {
         try {
             const raw = await redis.get(`trip:${code}`);
@@ -95,6 +99,7 @@ async function getTrip(code) {
     return memGet(code);
 }
 async function deleteTrip(code) {
+    await redisReady;
     if (redis && redisAvailable) {
         try {
             await redis.del(`trip:${code}`);
@@ -105,5 +110,9 @@ async function deleteTrip(code) {
         }
     }
     memDel(code);
+}
+async function getTripStoreStatus() {
+    await redisReady;
+    return redis && redisAvailable ? "redis" : "memory";
 }
 exports.default = redis;

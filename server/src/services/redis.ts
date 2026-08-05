@@ -111,4 +111,9 @@ export async function deleteTrip(code: string): Promise<void> {
   memDel(code);
 }
 
+export async function getTripStoreStatus(): Promise<"redis" | "memory"> {
+  await redisReady;
+  return redis && redisAvailable ? "redis" : "memory";
+}
+
 export default redis;
