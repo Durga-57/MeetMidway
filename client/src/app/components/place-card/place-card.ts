@@ -18,10 +18,10 @@ import { formatDistance } from "../../utils/geo";
         <div class="place-card__body">
           <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
             <span class="place-card__name">{{ place.name }}</span>
-            <span [class]="getFairnessClass()">{{ place.fairnessScore.toFixed(0) }}% Fair</span>
+            <span [class]="getFairnessClass()">{{ place.fairnessScore.toFixed(0) }}% fair</span>
           </div>
           <div class="place-card__meta">
-            avg:{{ formatDistanceValue(place.avg) }} max:{{ formatDistanceValue(place.maxD) }}
+            {{ formatDistanceValue(place.avg) }} average · {{ formatDistanceValue(place.maxD) }} longest
           </div>
         </div>
 
@@ -29,21 +29,22 @@ import { formatDistance } from "../../utils/geo";
       </div>
 
       <div class="place-card__actions" (click)="$event.stopPropagation()">
-        <button class="place-vote-btn" type="button" [class.active]="hasVoted" (click)="vote.emit()" [disabled]="!!confirmedPlaceId">
-          <span class="heart-icon">{{ hasVoted ? '❤️' : '🤍' }}</span>
-          <span>{{ voteCount }}</span>
+        <button class="place-vote-btn" type="button" [class.active]="hasVoted" (click)="vote.emit()" [disabled]="!!confirmedPlaceId" [attr.aria-label]="hasVoted ? 'Remove your vote' : 'Vote for ' + place.name">
+          <span class="heart-icon">{{ hasVoted ? '✓' : '↑' }}</span>
+          <span>{{ hasVoted ? 'Voted' : 'Vote' }}</span>
+          <strong>{{ voteCount }}</strong>
         </button>
         @if (confirmedPlaceId === place.id) {
-          <span class="place-confirmed">Confirmed spot</span>
+          <span class="place-confirmed">Meetup spot confirmed</span>
         } @else if (!confirmedPlaceId) {
-          <button class="place-confirm-btn" type="button" (click)="confirm.emit()">Lock this spot</button>
+          <button class="place-confirm-btn" type="button" (click)="confirm.emit()">Confirm choice</button>
         }
       </div>
 
       <!-- Voter avatars -->
       @if (voters.length > 0) {
         <div class="place-card__voters">
-          <span class="place-card__voters-label">Voted by:</span>
+          <span class="place-card__voters-label">{{ voteCount }} {{ voteCount === 1 ? 'vote' : 'votes' }}</span>
           <div class="place-card__voters-list">
             @for (voter of voters; track voter.id) {
               <div class="place-card__voter-avatar" [style.background]="voter.color" [title]="voter.name">
@@ -57,7 +58,7 @@ import { formatDistance } from "../../utils/geo";
       <!-- Expand toggle -->
       <button class="place-card__toggle" (click)="toggleExpanded($event)">
         <span>{{ expanded ? "▴" : "▾" }}</span>
-        <span>Distance breakdown</span>
+        <span>{{ expanded ? 'Hide' : 'See' }} distance breakdown</span>
       </button>
 
       <!-- Distance breakdown -->

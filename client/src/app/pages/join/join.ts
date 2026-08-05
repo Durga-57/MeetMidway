@@ -5,6 +5,7 @@ import { Subscription } from "rxjs";
 import { TripService } from "../../services/trip.service";
 import { GeocoderService, GeoResult } from "../../services/geocoder.service";
 import { AuthService } from '../../services/auth.service';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: "app-join",
@@ -135,7 +136,8 @@ export class JoinComponent implements OnInit, OnDestroy {
     private router: Router,
     private tripService: TripService,
     private geocoderService: GeocoderService,
-    public auth: AuthService
+    public auth: AuthService,
+    private dashboard: DashboardService
   ) {}
 
   ngOnInit() {
@@ -228,8 +230,16 @@ export class JoinComponent implements OnInit, OnDestroy {
     const cleanCode = this.code.trim().toUpperCase();
 
     this.tripService.addFriend(cleanCode, this.auth.displayName(), this.address.trim()).subscribe({
-      next: () => {
+      next: (result) => {
         this.loading = false;
+        const userId = this.auth.session()?.user.id || "";
+        this.dashboard.record(userId, {
+          type: "joined",
+          title: `Joined “${result.trip.name}”`,
+          tripCode: cleanCode,
+          tripName: result.trip.name,
+          participantCount: result.trip.friends.length,
+        });
         this.router.navigate([`/trip/${cleanCode}`]);
       },
       error: (err) => {

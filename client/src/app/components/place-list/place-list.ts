@@ -9,7 +9,7 @@ import { PlaceCardComponent } from "../place-card/place-card";
   standalone: true,
   imports: [PlaceCardComponent],
   template: `
-    <div>
+    <div class="place-list">
       @if (isSearching) {
         <div class="loading-center">
           <div class="spinner"></div>
@@ -21,24 +21,21 @@ import { PlaceCardComponent } from "../place-card/place-card";
         </div>
         <button class="btn btn-secondary btn-sm" (click)="retry.emit()">Retry</button>
       } @else if (places.length > 0) {
-        <div>
-          <div class="section-label">Top recommendations ({{ places.length }})</div>
-          @for (place of places; track place.id; let idx = $index) {
-            <app-place-card
-              [place]="place"
-              [rank]="idx"
-              [friends]="friends"
-              [isSelected]="selectedPlaceId === place.id"
-              [voteCount]="votes[voteKey(place.id)]?.length || 0"
-              [hasVoted]="!!currentVoterId && (votes[voteKey(place.id)] || []).includes(currentVoterId)"
-              [confirmedPlaceId]="confirmedPlaceId"
-              [voterIds]="votes[voteKey(place.id)] || []"
-              (select)="onSelectPlace(place.id)"
-              (vote)="vote.emit(place.id)"
-              (confirm)="confirm.emit(place.id)"
-            ></app-place-card>
-          }
-        </div>
+        @for (place of places; track place.id; let idx = $index) {
+          <app-place-card
+            [place]="place"
+            [rank]="idx"
+            [friends]="friends"
+            [isSelected]="selectedPlaceId === place.id"
+            [voteCount]="votes[voteKey(place.id)]?.length || 0"
+            [hasVoted]="!!currentVoterId && (votes[voteKey(place.id)] || []).includes(currentVoterId)"
+            [confirmedPlaceId]="confirmedPlaceId"
+            [voterIds]="votes[voteKey(place.id)] || []"
+            (select)="onSelectPlace(place.id)"
+            (vote)="vote.emit(place.id)"
+            (confirm)="confirm.emit(place.id)"
+          ></app-place-card>
+        }
       }
     </div>
   `

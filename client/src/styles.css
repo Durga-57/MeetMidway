@@ -372,7 +372,7 @@ html.dark .trip-brand-logo img {
   top: -200px;
   opacity: 0.18;
   filter: blur(48px);
-  background: radial-gradient(circle at 18% 35%, #00dfd8 0 8%, transparent 31%), radial-gradient(circle at 53% 53%, #007cf0 0 12%, transparent 39%), radial-gradient(circle at 75% 35%, #7928ca 0 11%, transparent 37%), radial-gradient(circle at 70% 76%, #ff0080 0 8%, transparent 31%), radial-gradient(circle at 35% 80%, #f9cb28 0 7%, transparent 25%);
+  background: var(--surface-alt);
   pointer-events: none;
 }
 
@@ -546,6 +546,169 @@ html.dark .trip-brand-logo img {
 
 html {
   scroll-behavior: smooth;
+}
+
+.recommendations-panel {
+  margin: 1rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.trip-shell {
+  grid-template-columns: 280px minmax(0, 1fr) minmax(340px, 420px);
+}
+
+.trip-shell:not(.trip-shell--has-results) .trip-shell__map {
+  grid-column: 2 / -1;
+}
+
+.trip-shell__results {
+  min-width: 0;
+  margin: 0;
+  border-width: 0 0 0 1px;
+  border-radius: 0;
+  overflow-y: auto;
+}
+
+.trip-shell__results .recommendations-panel__header {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.trip-shell__results .recommendations-panel__meta {
+  width: 100%;
+}
+
+.trip-shell__results .place-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.recommendations-panel__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.recommendations-panel__header h2 {
+  margin-bottom: 0.35rem;
+  font-size: 1.35rem;
+}
+
+.recommendations-panel__intro {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.recommendations-panel__meta {
+  flex-shrink: 0;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.recommendations-panel .place-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.recommendations-panel .place-list > div {
+  min-width: 0;
+}
+
+.recommendations-panel .place-card {
+  height: 100%;
+  padding: 1rem;
+  margin-bottom: 0;
+}
+
+.recommendations-panel .place-card__name {
+  font-size: 14px;
+}
+
+.recommendations-panel .place-card__actions {
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.recommendations-panel .place-vote-btn {
+  flex: 1;
+  min-height: 38px;
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+}
+
+.recommendations-panel .place-vote-btn strong {
+  margin-left: auto;
+  font-family: var(--font-mono);
+}
+
+.recommendations-panel .place-confirm-btn {
+  min-height: 38px;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.recommendations-panel .place-confirm-btn:hover {
+  background: var(--surface-alt);
+  text-decoration: none;
+}
+
+@media (max-width: 720px) {
+  .recommendations-panel {
+    margin: 0.75rem;
+    padding: 1rem;
+  }
+
+  .recommendations-panel__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .recommendations-panel__meta {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1100px) {
+  .trip-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .trip-shell__results {
+    grid-column: 1 / -1;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .trip-shell:not(.trip-shell--has-results) .trip-shell__map {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .trip-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-shell__results {
+    grid-column: auto;
+  }
 }
 
 /* ─── Dashboard Styles ───────────────────────────────────────────────────── */

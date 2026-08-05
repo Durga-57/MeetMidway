@@ -73,12 +73,12 @@ export const PLACE_TYPE_EMOJIS: Record<PlaceType, string> = {
 };
 
 export const FRIEND_COLORS = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#FFE66D",
-  "#A8E6CF",
-  "#FF8B94",
-  "#6C5CE7",
-  "#FFA552",
-  "#74B9FF",
+  "#1d4ed8",
+  "#0f766e",
+  "#475569",
+  "#334155",
+  "#0369a1",
+  "#4f46e5",
+  "#64748b",
+  "#1e40af",
 ];

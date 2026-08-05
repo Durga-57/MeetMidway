@@ -49,6 +49,7 @@ export class AuthCallbackComponent {
   private setWelcomeFlag(type: 'new' | 'returning') {
     sessionStorage.setItem('mm_welcome', type);
     sessionStorage.setItem('mm_welcome_name', this.auth.displayName());
+    sessionStorage.setItem('mm_welcome_dashboard', type);
   }
 
   private isLikelyNewUser(createdAt?: string, lastSignInAt?: string): boolean {

@@ -15,6 +15,7 @@ import { SearchControlsComponent } from "../../components/search-controls/search
 import { TripCodeBadgeComponent } from "../../components/trip-code-badge/trip-code-badge";
 import { NgZone } from "@angular/core";
 import { AuthService } from '../../services/auth.service';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: "app-trip-room",
@@ -51,7 +52,7 @@ import { AuthService } from '../../services/auth.service';
         </nav>
 
         <!-- Split layout -->
-        <div class="trip-shell">
+        <div class="trip-shell" [class.trip-shell--has-results]="places.length > 0 || isSearching || !!searchError">
           <!-- Sidebar -->
           <aside class="trip-shell__sidebar">
             <!-- Invite code -->
@@ -155,22 +156,6 @@ import { AuthService } from '../../services/auth.service';
               (search)="handleSearch()"
             ></app-search-controls>
 
-            <!-- Results -->
-            @if (places.length > 0 || isSearching || searchError) {
-              <div class="divider"></div>
-              <app-place-list
-                [places]="places"
-                [friends]="trip.friends"
-                [isSearching]="isSearching"
-                [searchError]="searchError"
-                [votes]="trip.votes || {}"
-                [currentVoterId]="auth.session()?.user?.id || ''"
-                [confirmedPlaceId]="trip.confirmedPlaceId"
-                (retry)="handleSearch()"
-                (vote)="handleVote($event)"
-                (confirm)="handleConfirm($event)"
-              ></app-place-list>
-            }
           </aside>
 
           <!-- Map panel -->
@@ -188,6 +173,33 @@ import { AuthService } from '../../services/auth.service';
               [selectedPlaceId]="selectedPlaceId"
             ></app-map>
           </section>
+
+        @if (places.length > 0 || isSearching || searchError) {
+          <section class="trip-shell__results recommendations-panel" aria-labelledby="recommendations-title">
+            <div class="recommendations-panel__header">
+              <div>
+                <p class="section-label">Decision workspace</p>
+                <h2 id="recommendations-title">Recommended for your group</h2>
+                <p class="recommendations-panel__intro">Ranked by travel fairness. Review the trade-offs, then vote for the place your group would actually choose.</p>
+              </div>
+              @if (places.length > 0 && !isSearching) {
+                <div class="recommendations-panel__meta">{{ places.length }} options · {{ totalVotes }} votes</div>
+              }
+            </div>
+            <app-place-list
+              [places]="places"
+              [friends]="trip.friends"
+              [isSearching]="isSearching"
+              [searchError]="searchError"
+              [votes]="trip.votes || {}"
+              [currentVoterId]="auth.session()?.user?.id || ''"
+              [confirmedPlaceId]="trip.confirmedPlaceId"
+              (retry)="handleSearch()"
+              (vote)="handleVote($event)"
+              (confirm)="handleConfirm($event)"
+            ></app-place-list>
+          </section>
+        }
         </div>
       </div>
     }
@@ -237,6 +249,7 @@ export class TripRoomComponent implements OnInit, AfterViewChecked, OnDestroy {
     private socketService: SocketService,
     private geocoderService: GeocoderService,
     public auth: AuthService,
+    private dashboard: DashboardService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef
   ) { }
@@ -294,6 +307,10 @@ export class TripRoomComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.subs.forEach((s) => s.unsubscribe());
     this.socketService.leaveRoom();
     if (this.debounceTimeout) clearTimeout(this.debounceTimeout);
+  }
+
+  get totalVotes(): number {
+    return Object.values(this.trip?.votes || {}).reduce((total, voters) => total + voters.length, 0);
   }
 
   @HostListener("document:mousedown", ["$event"])
@@ -403,7 +420,17 @@ export class TripRoomComponent implements OnInit, AfterViewChecked, OnDestroy {
     const voterId = this.auth.session()?.user.id;
     if (!this.code || !voterId) return;
     this.tripService.voteForPlace(this.code, placeId, voterId).subscribe({
-      next: ({ trip }) => this.store.setTrip(trip),
+      next: ({ trip }) => {
+        this.store.setTrip(trip);
+        const place = this.places.find((candidate) => candidate.id === placeId);
+        this.dashboard.record(voterId, {
+          type: "voted",
+          title: `Voted for “${place?.name || "a recommendation"}”`,
+          tripCode: trip.code,
+          tripName: trip.name,
+          participantCount: trip.friends.length,
+        });
+      },
       error: (err) => this.store.setSearchError(err.error?.error || 'Unable to save your vote.')
     });
   }

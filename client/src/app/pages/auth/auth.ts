@@ -46,7 +46,7 @@ import { AuthService } from '../../services/auth.service';
         </form>
 
         <p class="auth-switch">{{ mode === 'signup' ? 'Already have an account?' : 'New to MeetMidway?' }}
-          <button type="button" (click)="toggleMode()">{{ mode === 'signup' ? 'Sign in' : 'Create an account' }}</button>
+          <button type="button" (click)="toggleMode()">{{ mode === 'signup' ? 'Sign in' : 'Create account' }}</button>
         </p>
       </section>
 
@@ -145,6 +145,7 @@ export class AuthComponent {
   private setWelcomeFlag(type: 'new' | 'returning', name: string) {
     sessionStorage.setItem('mm_welcome', type);
     sessionStorage.setItem('mm_welcome_name', name || 'there');
+    sessionStorage.setItem('mm_welcome_dashboard', type);
   }
 
   private firstName(name: string): string {

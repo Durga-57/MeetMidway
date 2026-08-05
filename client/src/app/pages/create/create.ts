@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { PlaceType, PLACE_TYPE_EMOJIS, PLACE_TYPE_LABELS } from "@shared/types";
 import { TripService } from "../../services/trip.service";
 import { AuthService } from '../../services/auth.service';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: "app-create",
@@ -86,7 +87,7 @@ import { AuthService } from '../../services/auth.service';
                 <div class="spinner spinner--sm spinner--white"></div>
                 <span>Creating…</span>
               } @else {
-                <span>Create trip session</span>
+                <span>Create trip</span>
               }
             </button>
           </form>
@@ -110,7 +111,8 @@ export class CreateComponent {
   constructor(
     private tripService: TripService,
     private router: Router,
-    public auth: AuthService
+    public auth: AuthService,
+    private dashboard: DashboardService
   ) {}
 
   setPlaceType(type: PlaceType) {
@@ -151,6 +153,14 @@ export class CreateComponent {
     this.tripService.createTrip(tripName, this.placeType, creatorName, creatorAddress).subscribe({
       next: (result) => {
         this.loading = false;
+        const userId = this.auth.session()?.user.id || "";
+        this.dashboard.record(userId, {
+          type: "created",
+          title: `Created “${result.trip.name}”`,
+          tripCode: result.code,
+          tripName: result.trip.name,
+          participantCount: result.trip.friends.length,
+        });
         this.router.navigate([`/trip/${result.code}`]);
       },
       error: (err) => {
