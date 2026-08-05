@@ -5,11 +5,12 @@ import { PlaceType, PLACE_TYPE_EMOJIS, PLACE_TYPE_LABELS } from "@shared/types";
 import { TripService } from "../../services/trip.service";
 import { AuthService } from '../../services/auth.service';
 import { DashboardService } from '../../services/dashboard.service';
+import { PlaceTypeIconComponent } from '../../components/place-type-icon/place-type-icon';
 
 @Component({
   selector: "app-create",
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, PlaceTypeIconComponent],
   template: `
     <div class="page-shell page-shell--centered trip-form-page">
       <section class="home-hero create-hero auth-panel trip-form-panel">
@@ -66,7 +67,7 @@ import { DashboardService } from '../../services/dashboard.service';
                       [class.selected]="placeType === type"
                       class="place-type-btn"
                     >
-                      <span>{{ getEmoji(type) }}</span>
+                      <app-place-type-icon [type]="type"></app-place-type-icon>
                       <span>{{ getLabel(type) }}</span>
                     </button>
                   }

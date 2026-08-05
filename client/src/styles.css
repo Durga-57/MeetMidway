@@ -350,6 +350,156 @@ html.dark .trip-brand-logo img {
   }
 }
 
+/* Trip controls and voting refinements */
+.code-badge {
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.code-badge > div:first-child {
+  min-width: 0;
+}
+
+.code-badge__actions {
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.code-badge__action {
+  min-width: 78px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 13px/1.4 var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.code-badge__action:hover {
+  background: var(--surface-alt);
+  border-color: var(--text-muted);
+}
+
+.code-badge__action svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+}
+
+.category-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.category-select .place-type-icon {
+  position: absolute;
+  left: 0.75rem;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.category-select .form-select {
+  padding-left: 2.5rem;
+}
+
+.place-type-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.place-card__icon .place-type-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+}
+
+.voting-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+}
+
+.voting-guide div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.voting-guide strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.voting-guide span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.voting-guide__count {
+  flex-shrink: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.place-vote-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.place-vote-btn .heart-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .code-badge {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .code-badge__actions {
+    width: 100%;
+  }
+
+  .code-badge__action {
+    flex: 1;
+  }
+
+  .voting-guide {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 @media (min-width: 1200px) {
   .trip-shell {
     grid-template-columns: minmax(700px, 2.2fr) minmax(280px, 1fr);
@@ -1493,7 +1643,7 @@ app-root,
 .friend-empty {
   text-align: center;
   padding: 1.25rem 0.5rem;
-  border: 1px dashed var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text-faint);
   font-size: 12px;
@@ -2755,4 +2905,150 @@ body,
 .auth-panel h1 {
   font-size: 2.2rem;
   line-height: 1.08;
+}
+
+/* Final refinements for the trip room controls. */
+.code-badge {
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.code-badge__actions {
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.code-badge__action {
+  min-width: 78px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 13px/1.4 var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.code-badge__action:hover {
+  background: var(--surface-alt);
+  border-color: var(--text-muted);
+}
+
+.code-badge__action svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+}
+
+.category-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.category-select .place-type-icon {
+  position: absolute;
+  left: 0.75rem;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.category-select .form-select {
+  padding-left: 2.5rem;
+}
+
+.place-type-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.place-card__icon .place-type-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+}
+
+.voting-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+}
+
+.voting-guide div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.voting-guide strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.voting-guide span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.voting-guide__count {
+  flex-shrink: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.place-vote-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.place-vote-btn .heart-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .code-badge {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .code-badge__actions {
+    width: 100%;
+  }
+
+  .code-badge__action {
+    flex: 1;
+  }
+
+  .voting-guide {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

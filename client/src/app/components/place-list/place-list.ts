@@ -21,6 +21,13 @@ import { PlaceCardComponent } from "../place-card/place-card";
         </div>
         <button class="btn btn-secondary btn-sm" (click)="retry.emit()">Retry</button>
       } @else if (places.length > 0) {
+        <div class="voting-guide">
+          <div>
+            <strong>Vote for one place</strong>
+            <span>Your vote is highlighted. You can change it at any time.</span>
+          </div>
+          <span class="voting-guide__count">{{ totalVotes }} {{ totalVotes === 1 ? 'vote' : 'votes' }}</span>
+        </div>
         @for (place of places; track place.id; let idx = $index) {
           <app-place-card
             [place]="place"
@@ -74,5 +81,9 @@ export class PlaceListComponent implements OnInit, OnDestroy {
 
   voteKey(placeId: number): string {
     return String(placeId);
+  }
+
+  get totalVotes(): number {
+    return Object.values(this.votes).reduce((total, voters) => total + voters.length, 0);
   }
 }

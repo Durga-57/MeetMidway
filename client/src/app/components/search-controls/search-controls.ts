@@ -3,24 +3,28 @@ import { FormsModule } from "@angular/forms";
 import { Subscription } from "rxjs";
 import { PlaceType, PLACE_TYPE_EMOJIS, PLACE_TYPE_LABELS } from "@shared/types";
 import { TripStoreService } from "../../services/trip-store.service";
+import { PlaceTypeIconComponent } from "../place-type-icon/place-type-icon";
 
 @Component({
   selector: "app-search-controls",
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PlaceTypeIconComponent],
   template: `
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
       <div class="form-group" style="margin-bottom: 0;">
         <label class="form-label">Category</label>
-        <select
-          [ngModel]="placeType || defaultPlaceType"
-          (ngModelChange)="setPlaceType($event)"
-          class="form-select"
-        >
-          @for (type of placeTypes; track type) {
-            <option [value]="type">{{ getEmoji(type) }} {{ getLabel(type) }}</option>
-          }
-        </select>
+        <div class="category-select">
+          <app-place-type-icon [type]="placeType || defaultPlaceType"></app-place-type-icon>
+          <select
+            [ngModel]="placeType || defaultPlaceType"
+            (ngModelChange)="setPlaceType($event)"
+            class="form-select"
+          >
+            @for (type of placeTypes; track type) {
+              <option [value]="type">{{ getLabel(type) }}</option>
+            }
+          </select>
+        </div>
       </div>
 
       <div class="form-group" style="margin-bottom: 0;">

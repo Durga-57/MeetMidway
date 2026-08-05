@@ -1,10 +1,12 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { ScoredPlace, Friend, PLACE_TYPE_EMOJIS } from "@shared/types";
 import { formatDistance } from "../../utils/geo";
+import { PlaceTypeIconComponent } from "../place-type-icon/place-type-icon";
 
 @Component({
   selector: "app-place-card",
   standalone: true,
+  imports: [PlaceTypeIconComponent],
   template: `
     <div
       (click)="select.emit()"
@@ -13,7 +15,7 @@ import { formatDistance } from "../../utils/geo";
     >
       <!-- Top row -->
       <div class="place-card__header">
-        <div class="place-card__icon">{{ getEmoji() }}</div>
+        <div class="place-card__icon"><app-place-type-icon [type]="place.placeType"></app-place-type-icon></div>
 
         <div class="place-card__body">
           <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
