@@ -12,7 +12,7 @@ import {
   ChangeDetectorRef,
 } from "@angular/core";
 import * as L from "leaflet";
-import { Friend, ScoredPlace, PLACE_TYPE_EMOJIS } from "@shared/types";
+import { Friend, PlaceType, ScoredPlace } from "@shared/types";
 import { TripStoreService } from "../../services/trip-store.service";
 
 // Fix Leaflet default icon paths in bundler
@@ -198,11 +198,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy
     this.placeMarkers = [];
 
     this.places.forEach((place) => {
-      const emoji = PLACE_TYPE_EMOJIS[place.placeType] || "📍";
       const isSelected = place.id === this.selectedPlaceId;
 
       const icon = L.divIcon({
-        html: `<div class="place-marker${isSelected ? " selected" : ""}">${emoji}</div>`,
+        html: `<div class="place-marker${isSelected ? " selected" : ""}"><svg viewBox="0 0 24 24" aria-hidden="true">${this.getPlaceMarkerIcon(place.placeType)}</svg></div>`,
         className: "",
         iconSize: [40, 40],
         iconAnchor: [20, 20],
@@ -250,15 +249,37 @@ export class MapComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy
 
           const line = L.polyline(path, {
             color: friend.color,
-            weight: 4,
-            opacity: 0.95,
-            dashArray: "8, 8",
+            weight: 2.5,
+            opacity: 0.72,
             lineCap: "round",
+            lineJoin: "round",
           }).addTo(this.map!);
 
           this.polylines.push(halo, line);
         });
       }
+    }
+  }
+
+  private getPlaceMarkerIcon(type: PlaceType): string {
+    switch (type) {
+      case "cafe":
+        return '<path d="M5 8h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2M3 21h15"/>';
+      case "movie_theater":
+        return '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m8 5 3 4-3 4 3 4M15 5l-3 4 3 4-3 4"/>';
+      case "park":
+        return '<path d="M12 21V10"/><path d="M12 14c-4 0-6-2.2-6-5 3.2 0 5 1.3 6 4 1-2.7 2.8-4 6-4 0 2.8-2 5-6 5Z"/>';
+      case "bar":
+        return '<path d="m6 3 6 8 6-8M12 11v8M8 21h8M4 3h16"/>';
+      case "shopping_mall":
+        return '<path d="M4 8h16l-1 12H5L4 8Z"/><path d="M8 8a4 4 0 0 1 8 0M9 12v2M15 12v2"/>';
+      case "museum":
+        return '<path d="m3 9 9-5 9 5M4 9h16M6 9v8M10 9v8M14 9v8M18 9v8M3 20h18"/>';
+      case "bowling_alley":
+        return '<circle cx="12" cy="15" r="6"/><circle cx="10" cy="13" r=".7" fill="currentColor"/><circle cx="13.5" cy="12.5" r=".7" fill="currentColor"/>';
+      case "restaurant":
+      default:
+        return '<path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 13v8M15 3v18M15 3c3 1 4.5 3.5 4.5 6.5H15"/>';
     }
   }
 

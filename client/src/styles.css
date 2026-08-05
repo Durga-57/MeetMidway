@@ -500,6 +500,51 @@ html.dark .trip-brand-logo img {
   }
 }
 
+/* Keep the compact trip sidebar readable at every desktop width. */
+.trip-shell__sidebar .code-badge {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.trip-shell__sidebar .code-badge__content {
+  min-width: 0;
+}
+
+.trip-shell__sidebar .code-badge__code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trip-shell__sidebar .code-badge__actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-left: 0;
+}
+
+.trip-shell__sidebar .code-badge__action {
+  min-width: 0;
+  width: 100%;
+}
+
+.place-marker svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.place-marker.selected svg {
+  width: 21px;
+  height: 21px;
+}
+
 @media (min-width: 1200px) {
   .trip-shell {
     grid-template-columns: minmax(700px, 2.2fr) minmax(280px, 1fr);
